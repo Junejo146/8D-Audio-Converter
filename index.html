@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0e0e13" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>8D Audio Converter - Immersive Spatial Sound</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./src/style.css" />
+</head>
+<body>
+  <div class="app-layout">
+    
+    <!-- Mobile Screen Frame Container -->
+    <main class="mobile-frame" id="mobile-screen">
+      
+      <!-- Top Status Bar / Header Area -->
+      <header class="app-header">
+        <button class="icon-btn" id="btn-menu" aria-label="Open menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+
+        <div class="brand-header-box">
+          <div class="brand-icon-emblem">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="url(#brandGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <defs>
+                <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#a78bfa" />
+                  <stop offset="100%" stop-color="#38bdf8" />
+                </linearGradient>
+              </defs>
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="3" fill="#a78bfa"></circle>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+          </div>
+          <h1 class="header-title">8D Audio Converter</h1>
+        </div>
+
+        <button class="icon-btn" id="btn-search" aria-label="Search audio">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+      </header>
+
+      <!-- Tagline -->
+      <div class="tagline-container">
+        <p class="tagline-text">Transform your music into immersive <span class="glow-span">8D sound.</span></p>
+      </div>
+
+      <!-- Main Scrollable Screen Content -->
+      <div class="screen-content" id="main-content-scroll">
+        
+        <!-- Screen 1: HOME SCREEN -->
+        <section class="tab-pane active" id="tab-home">
+          
+          <!-- Hero Pulsing Select Audio Button -->
+          <div class="hero-selector-wrapper">
+            <div class="pulse-ring pulse-ring-1"></div>
+            <div class="pulse-ring pulse-ring-2"></div>
+            <div class="pulse-ring pulse-ring-3"></div>
+
+            <button class="hero-select-circle" id="btn-select-audio" aria-label="Select Audio File">
+              <div class="hero-inner-glow"></div>
+              <div class="hero-icon-container">
+                <!-- Stacked Music Library Icon -->
+                <svg class="music-stack-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="7" y="11" width="28" height="28" rx="7" stroke="white" stroke-width="2.5" opacity="0.6" />
+                  <rect x="13" y="5" width="28" height="28" rx="7" fill="rgba(255,255,255,0.15)" stroke="white" stroke-width="2.5" />
+                  <path d="M23 23V14L32 12V21" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="21" cy="23" r="3" fill="white" />
+                  <circle cx="30" cy="21" r="3" fill="white" />
+                </svg>
+              </div>
+              <span class="hero-label">Select Audio</span>
+            </button>
+
+            <!-- Hidden File Input -->
+            <input type="file" id="audio-file-input" accept="audio/*,.mp3,.wav,.ogg,.m4a,.flac,.aac" style="display: none;" />
+          </div>
+
+          <!-- Headphone Recommended Tip -->
+          <div class="headphone-tip">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+              <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+            </svg>
+            <span>Wear headphones for the full 360° 8D sensation</span>
+          </div>
+
+          <!-- Recent Conversions Section -->
+          <div class="section-container recent-section">
+            <div class="section-header">
+              <h2 class="section-title">Recent Conversions</h2>
+              <button class="see-all-btn" id="btn-see-all">See All</button>
+            </div>
+
+            <!-- List of tracks -->
+            <div class="tracks-list" id="recent-tracks-list"></div>
+          </div>
+        </section>
+
+        <!-- Screen 2: AUDIO SELECTION SCREEN -->
+        <section class="tab-pane" id="screen-audio-select">
+          <div class="sub-screen-header">
+            <button class="icon-btn back-btn" id="btn-back-from-select" aria-label="Go back">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5"></path>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+            </button>
+            <h2 class="sub-screen-title">Select Audio</h2>
+            <div style="width: 40px;"></div>
+          </div>
+
+          <!-- Selection Options Cards -->
+          <div class="selection-options-group">
+            <h3 class="selection-group-title">Browse Sources</h3>
+
+            <!-- Card 1: Device Files -->
+            <div class="selection-card" id="card-device-files">
+              <div class="selection-icon-box icon-purple">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </div>
+              <div class="selection-card-info">
+                <h4>Device Files</h4>
+                <p>Browse local audio from storage / downloads</p>
+              </div>
+              <div class="card-arrow">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Card 2: Music Library -->
+            <div class="selection-card" id="card-music-library">
+              <div class="selection-icon-box icon-blue">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polygon points="10 8 16 12 10 16 10 8"></polygon>
+                </svg>
+              </div>
+              <div class="selection-card-info">
+                <h4>Music Library</h4>
+                <p>Pick from stored tracks & demo studio beats</p>
+              </div>
+              <div class="card-arrow">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Card 3: Recent Audio -->
+            <div class="selection-card" id="card-recent-audio">
+              <div class="selection-icon-box icon-cyan">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+              </div>
+              <div class="selection-card-info">
+                <h4>Recent Audio</h4>
+                <p>Re-open recently converted 8D tracks</p>
+              </div>
+              <div class="card-arrow">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Supported Formats Section -->
+          <div class="supported-formats-container">
+            <h3 class="formats-title">Supported Formats</h3>
+            <div class="format-badges-grid">
+              <div class="format-badge">
+                <span class="fmt-ext">MP3</span>
+                <span class="fmt-desc">MPEG Audio</span>
+              </div>
+              <div class="format-badge">
+                <span class="fmt-ext">WAV</span>
+                <span class="fmt-desc">Lossless PCM</span>
+              </div>
+              <div class="format-badge">
+                <span class="fmt-ext">M4A</span>
+                <span class="fmt-desc">Apple Audio</span>
+              </div>
+              <div class="format-badge">
+                <span class="fmt-ext">AAC</span>
+                <span class="fmt-desc">Advanced Audio</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Screen 3: 8D AUDIO EDITOR SCREEN (DUAL LAYER SLOTS) -->
+        <section class="tab-pane" id="screen-audio-editor">
+          <!-- Top Sub-Header -->
+          <div class="sub-screen-header editor-sub-header">
+            <button class="icon-btn back-btn" id="btn-back-from-editor" aria-label="Go back">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5"></path>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+            </button>
+            <h2 class="sub-screen-title">8D Audio Studio</h2>
+            <div class="header-waveform-icon">
+              <span class="hw-bar"></span>
+              <span class="hw-bar"></span>
+              <span class="hw-bar"></span>
+              <span class="hw-bar"></span>
+            </div>
+          </div>
+
+          <!-- Song Info Bar -->
+          <div class="editor-song-info-banner">
+            <div class="banner-icon-disc">
+              <div class="mini-center-dot"></div>
+            </div>
+            <div class="banner-text">
+              <h3 class="editor-track-name" id="editor-song-title">Midnight City.mp3</h3>
+              <p class="editor-track-meta"><span id="editor-duration-text">4:02</span> • Lossless Input</p>
+            </div>
+            <div class="banner-badge" id="banner-active-mode">Stereo Mode</div>
+          </div>
+
+          <!-- DUAL AUDIO WAVEFORM SLOTS -->
+          <div class="dual-audio-container">
+            
+            <!-- SLOT 1: NORMAL AUDIO (ORIGINAL) -->
+            <div class="audio-slot-card normal-slot active-slot" id="slot-normal-audio">
+              <div class="slot-header">
+                <div class="slot-badge normal-badge">
+                  <span class="slot-indicator-dot normal-dot"></span>
+                  <span>NORMAL AUDIO (ORIGINAL)</span>
+                </div>
+                <span class="slot-status-text" id="status-normal-text">Pure Stereo • Ready</span>
+              </div>
+              
+              <div class="slot-body">
+                <div class="slot-wave-box">
+                  <canvas id="normal-waveform-canvas" width="260" height="44"></canvas>
+                  <div class="slot-time-row">
+                    <span id="normal-time-current">0:00</span>
+                    <span id="normal-time-total">4:02</span>
+                  </div>
+                </div>
+                <button class="slot-play-btn normal-play-btn" id="btn-play-normal-slot" aria-label="Play Normal Audio">
+                  <svg id="icon-normal-slot-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- PROMPT TO ACTIVATE 8D LAYER -->
+            <div class="slot-create-prompt" id="prompt-create-8d">
+              <div class="prompt-pulse-icon">✨</div>
+              <div class="prompt-text">
+                <div class="prompt-title">8D Spatial Layer Inactive</div>
+                <div class="prompt-sub">Choose any 8D preset or adjust speed below to generate 8D layer</div>
+              </div>
+            </div>
+
+            <!-- SLOT 2: 8D CONVERTED AUDIO (Hidden by default until 8D adjustment) -->
+            <div class="audio-slot-card spatial-slot" id="slot-8d-audio" style="display: none;">
+              <div class="slot-header">
+                <div class="slot-badge spatial-badge">
+                  <span class="slot-indicator-dot spatial-dot"></span>
+                  <span>8D SPATIAL AUDIO (EFFECT APPLIED)</span>
+                </div>
+                <span class="slot-status-text" id="status-8d-text">360° Orbit Ready</span>
+              </div>
+              
+              <div class="slot-body">
+                <div class="slot-wave-box">
+                  <canvas id="spatial-waveform-canvas" width="260" height="44"></canvas>
+                  <div class="slot-time-row">
+                    <span id="spatial-time-current">0:00</span>
+                    <span id="spatial-time-total">4:02</span>
+                  </div>
+                </div>
+                <button class="slot-play-btn spatial-play-btn" id="btn-play-spatial-slot" aria-label="Play 8D Audio">
+                  <svg id="icon-spatial-slot-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- SIMPLIFIED 8D CONTROLS -->
+          <div class="simplified-controls-card">
+            
+            <!-- Quick Presets -->
+            <div class="simple-control-group">
+              <div class="group-header">
+                <span class="group-label">1-Tap 8D Style</span>
+                <span class="group-hint">Select Effect</span>
+              </div>
+              <div class="preset-pills-row">
+                <button class="preset-pill active" data-preset="classic">
+                  <span>✨ Classic 8D</span>
+                </button>
+                <button class="preset-pill" data-preset="smooth">
+                  <span>🌊 Smooth</span>
+                </button>
+                <button class="preset-pill" data-preset="deep">
+                  <span>🌌 Deep 8D</span>
+                </button>
+                <button class="preset-pill" data-preset="fast">
+                  <span>⚡ Fast</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Control 1: 8D Rotation Speed -->
+            <div class="simple-slider-row">
+              <div class="simple-label-box">
+                <span class="simple-title">8D Rotation Speed</span>
+                <span class="simple-subtitle">Orbit speed around head</span>
+              </div>
+              <div class="simple-slider-wrap">
+                <input type="range" class="custom-slider blue-slider" id="slider-speed" min="2" max="20" step="0.5" value="8" />
+                <span class="ctrl-val-badge" id="val-speed">8.0s</span>
+              </div>
+            </div>
+
+            <!-- Control 2: 360° Spatial Depth -->
+            <div class="simple-slider-row">
+              <div class="simple-label-box">
+                <span class="simple-title">360° Spatial Depth</span>
+                <span class="simple-subtitle">Distance from ears</span>
+              </div>
+              <div class="simple-slider-wrap">
+                <input type="range" class="custom-slider violet-slider" id="slider-depth" min="1" max="6" step="0.2" value="3.0" />
+                <span class="ctrl-val-badge" id="val-depth">3.0m</span>
+              </div>
+            </div>
+
+            <!-- Control 3: Bass & Reverb Toggles -->
+            <div class="simple-toggles-grid">
+              <div class="toggle-card-box">
+                <div class="toggle-text">
+                  <span class="toggle-name">Concert Reverb</span>
+                  <span class="toggle-desc">Atmospheric space</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="switch-editor-reverb" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="toggle-card-box">
+                <div class="toggle-text">
+                  <span class="toggle-name">8D Bass Boost</span>
+                  <span class="toggle-desc">Deep low-end punch</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="switch-editor-bass" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Action: Convert & Save Button -->
+          <div class="editor-action-footer">
+            <button class="convert-8d-hero-btn" id="btn-editor-export-action">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Convert & Save 8D Audio</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Screen 4: 8D AUDIO PREVIEW SCREEN -->
+        <section class="tab-pane" id="screen-audio-preview">
+          <!-- Top Sub-Header -->
+          <div class="sub-screen-header preview-sub-header">
+            <button class="icon-btn back-btn" id="btn-back-from-preview" aria-label="Go back">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5"></path>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+            </button>
+            <h2 class="sub-screen-title">Preview 8D</h2>
+            <div class="preview-mode-badge" id="preview-mode-indicator">8D Active</div>
+          </div>
+
+          <!-- Hero Circular Animated Album Artwork -->
+          <div class="preview-art-hero">
+            <div class="art-pulse-ring ring-outer"></div>
+            <div class="art-pulse-ring ring-middle"></div>
+            <div class="art-pulse-ring ring-inner"></div>
+
+            <div class="preview-album-disc" id="preview-album-disc">
+              <div class="disc-center-art">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00f084" stroke-width="2">
+                  <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                  <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+                  <circle cx="12" cy="12" r="3" fill="rgba(0, 240, 132, 0.4)"></circle>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Track Title & Artist -->
+          <div class="preview-track-info">
+            <h3 class="preview-song-title" id="preview-song-title">Midnight City.mp3</h3>
+            <p class="preview-artist-name" id="preview-artist-name">Spatial Audio Master</p>
+          </div>
+
+          <!-- Realistic Audio Waveform Timeline -->
+          <div class="preview-timeline-container">
+            <div class="preview-waveform-box" id="preview-wf-box">
+              <canvas id="preview-waveform-canvas" width="360" height="48"></canvas>
+            </div>
+            <div class="preview-time-labels">
+              <span id="prev-time-current">0:00</span>
+              <span id="prev-time-total">4:02</span>
+            </div>
+          </div>
+
+          <!-- A/B Comparison Section -->
+          <div class="comparison-section">
+            <h4 class="comparison-title">A/B Audio Comparison</h4>
+            <div class="comparison-cards-grid">
+              
+              <!-- Card 1: Original Audio -->
+              <div class="comparison-card" id="card-mode-original">
+                <div class="comp-icon-box comp-stereo">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                    <circle cx="8" cy="12" r="2"></circle>
+                    <circle cx="16" cy="12" r="2"></circle>
+                  </svg>
+                </div>
+                <div class="comp-info">
+                  <div class="comp-header-row">
+                    <h5>Original Audio</h5>
+                  </div>
+                  <p>Flat Stereo Sound</p>
+                </div>
+                <button class="comp-play-btn" id="btn-play-original" aria-label="Play Original Audio">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Card 2: 8D Audio -->
+              <div class="comparison-card active-8d" id="card-mode-8d">
+                <div class="comp-icon-box comp-spatial">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <circle cx="12" cy="12" r="3" fill="currentColor"></circle>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                  </svg>
+                </div>
+                <div class="comp-info">
+                  <div class="comp-header-row">
+                    <h5>8D Audio</h5>
+                    <span class="badge-8d">8D Active</span>
+                  </div>
+                  <p>360° Binaural Orbit</p>
+                </div>
+                <button class="comp-play-btn active-btn" id="btn-play-8d" aria-label="Play 8D Audio">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                  </svg>
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Bottom Action: Convert to 8D Button -->
+          <div class="preview-action-footer">
+            <button class="convert-8d-hero-btn" id="btn-convert-to-8d">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Convert to 8D</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Screen 5: ADVANCED SETTINGS SCREEN -->
+        <section class="tab-pane" id="screen-advanced-settings">
+          <div class="sub-screen-header">
+            <button class="icon-btn back-btn" id="btn-back-from-settings" aria-label="Go back">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5"></path>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+            </button>
+            <h2 class="sub-screen-title">Advanced Settings</h2>
+            <div style="width: 40px;"></div>
+          </div>
+
+          <!-- Settings Groups List -->
+          <div class="advanced-settings-list">
+            
+            <!-- Group 1: Format & Quality Output -->
+            <div class="settings-group-card">
+              <h3 class="group-card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Output Audio Format
+              </h3>
+              
+              <div class="segmented-picker" id="picker-output-format">
+                <button class="segment-btn active" data-fmt="wav">WAV</button>
+                <button class="segment-btn" data-fmt="mp3">MP3</button>
+                <button class="segment-btn" data-fmt="m4a">M4A</button>
+              </div>
+
+              <div class="setting-row-item">
+                <div class="setting-text">
+                  <h4>Audio Quality Profile</h4>
+                  <p>Processing resolution and bit-depth</p>
+                </div>
+                <div class="quality-pills-row" id="picker-audio-quality">
+                  <button class="quality-pill" data-quality="standard">Standard</button>
+                  <button class="quality-pill" data-quality="high">High</button>
+                  <button class="quality-pill active" data-quality="ultra">Ultra</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Group 2: Bitrate & Sample Rate -->
+            <div class="settings-group-card">
+              <h3 class="group-card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                Sampling & Encoding
+              </h3>
+
+              <div class="setting-dropdown-row">
+                <div class="setting-text">
+                  <h4>Output Bitrate</h4>
+                  <p>Compression bandwidth rate</p>
+                </div>
+                <select class="settings-select" id="select-bitrate">
+                  <option value="128">128 kbps (Compact)</option>
+                  <option value="192">192 kbps (Standard)</option>
+                  <option value="256">256 kbps (High Quality)</option>
+                  <option value="320" selected>320 kbps (Studio Master)</option>
+                </select>
+              </div>
+
+              <div class="setting-dropdown-row">
+                <div class="setting-text">
+                  <h4>Sample Rate</h4>
+                  <p>Audio frequency fidelity</p>
+                </div>
+                <select class="settings-select" id="select-sample-rate">
+                  <option value="44100">44.1 kHz (CD Audio)</option>
+                  <option value="48000" selected>48.0 kHz (Studio HD)</option>
+                  <option value="96000">96.0 kHz (Hi-Res Audio)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Group 3: Spatial Acoustics & Stereo Width -->
+            <div class="settings-group-card">
+              <h3 class="group-card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00f084" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                Spatial Soundstage & Width
+              </h3>
+
+              <!-- Stereo Width Slider -->
+              <div class="setting-slider-block">
+                <div class="setting-slider-header">
+                  <div>
+                    <h4>Stereo Width Expansion</h4>
+                    <p>Widen left/right separation</p>
+                  </div>
+                  <span class="ctrl-val-badge" id="val-stereo-width">130%</span>
+                </div>
+                <input type="range" class="custom-slider green-slider" id="slider-stereo-width" min="50" max="200" value="130" />
+              </div>
+
+              <!-- Reverb Environment Selector -->
+              <div class="setting-dropdown-row">
+                <div class="setting-text">
+                  <h4>Acoustic Room Simulation</h4>
+                  <p>Concert reverb impulse environment</p>
+                </div>
+                <select class="settings-select" id="select-reverb-type">
+                  <option value="studio">Studio Room</option>
+                  <option value="concert" selected>Concert Hall</option>
+                  <option value="cathedral">Cathedral Space</option>
+                  <option value="arena">Stadium Arena</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Group 4: 8D Rotation Engine & Volume Limiter -->
+            <div class="settings-group-card">
+              <h3 class="group-card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                DSP Engine & Dynamics
+              </h3>
+
+              <div class="setting-toggle-row">
+                <div class="setting-text">
+                  <h4>Head-Shadow Filter</h4>
+                  <p>Realistic high-frequency occlusion behind head</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="switch-head-shadow" checked />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+
+              <div class="setting-toggle-row">
+                <div class="setting-text">
+                  <h4>Peak Limiter & Normalization</h4>
+                  <p>Prevent distortion and clipping spikes</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="switch-peak-limiter" checked />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Mobile Connection Info Card -->
+            <div class="settings-group-card" id="card-open-qr-modal" style="cursor: pointer;">
+              <div class="setting-toggle-row">
+                <div class="setting-text">
+                  <h4>Connect Another Device</h4>
+                  <p>Show Wi-Fi QR Code & Network URL</p>
+                </div>
+                <div class="card-arrow">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Screen 6: CONVERSION / PROCESSING SCREEN -->
+        <section class="tab-pane" id="screen-conversion-processing">
+          <!-- Ambient Background Waveform Canvas -->
+          <canvas id="processing-bg-canvas" class="processing-bg-waveform"></canvas>
+
+          <div class="processing-screen-layout">
+            <!-- Top Status Row -->
+            <div class="proc-top-bar">
+              <button class="icon-btn back-btn" id="btn-cancel-processing" aria-label="Cancel conversion">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+              <div class="proc-badge-tag">8D DSP Pipeline</div>
+              <div style="width: 40px;"></div>
+            </div>
+
+            <!-- Track Info Card -->
+            <div class="proc-track-card">
+              <div class="proc-disc-mini">
+                <div class="proc-disc-dot"></div>
+              </div>
+              <div class="proc-track-meta">
+                <h3 class="proc-track-title" id="proc-song-title">Midnight City.mp3</h3>
+                <p class="proc-track-sub" id="proc-song-meta">Binaural 360° • <span id="proc-duration-text">4:02</span></p>
+              </div>
+            </div>
+
+            <!-- Central Circular Progress Indicator -->
+            <div class="proc-gauge-wrapper">
+              <div class="gauge-glow-ambient"></div>
+              <svg class="proc-circular-svg" viewBox="0 0 200 200">
+                <defs>
+                  <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#7c4dff" />
+                    <stop offset="50%" stop-color="#3d7bfd" />
+                    <stop offset="100%" stop-color="#00f084" />
+                  </linearGradient>
+                  <filter id="gaugeGlow">
+                    <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                </defs>
+                <!-- Background Track Ring -->
+                <circle cx="100" cy="100" r="82" class="gauge-track-circle" />
+                <!-- Animated Progress Ring -->
+                <circle cx="100" cy="100" r="82" class="gauge-fill-circle" id="gauge-progress-circle" filter="url(#gaugeGlow)" />
+              </svg>
+
+              <!-- Central Percentage & Status -->
+              <div class="gauge-inner-content">
+                <span class="proc-percentage-text" id="proc-percent-num">78%</span>
+                <span class="proc-status-label" id="proc-main-status">Converting Audio...</span>
+              </div>
+            </div>
+
+            <!-- Three Processing Steps -->
+            <div class="proc-steps-container">
+              
+              <!-- Step 1: Analyzing Audio (Completed) -->
+              <div class="proc-step-row completed" id="step-analyzing">
+                <div class="step-indicator-box">
+                  <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+                <div class="step-details">
+                  <h4>Analyzing Audio</h4>
+                  <p>Frequency spectrogram & stereo channels</p>
+                </div>
+                <span class="step-status-tag done">Done</span>
+              </div>
+
+              <!-- Step 2: Applying 8D Effect (Active Glowing) -->
+              <div class="proc-step-row active" id="step-applying">
+                <div class="step-indicator-box">
+                  <div class="step-pulse-ring"></div>
+                  <div class="step-active-dot"></div>
+                </div>
+                <div class="step-details">
+                  <h4>Applying 8D Effect</h4>
+                  <p>HRTF 3D spatial orbit & acoustic reverb</p>
+                </div>
+                <span class="step-status-tag running">Processing...</span>
+              </div>
+
+              <!-- Step 3: Creating Output (Pending) -->
+              <div class="proc-step-row pending" id="step-output">
+                <div class="step-indicator-box">
+                  <div class="step-pending-dot"></div>
+                </div>
+                <div class="step-details">
+                  <h4>Creating Output</h4>
+                  <p>Lossless 24-bit WAV packaging</p>
+                </div>
+                <span class="step-status-tag wait">Pending</span>
+              </div>
+
+            </div>
+
+            <!-- Bottom Cancel / Abort Action -->
+            <div class="proc-action-bottom">
+              <button class="proc-cancel-btn" id="btn-abort-conversion">
+                Cancel Conversion
+              </button>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Screen 7: RESULT / COMPLETED SCREEN -->
+        <section class="tab-pane" id="screen-audio-result">
+          <div class="result-screen-layout">
+            
+            <!-- Top Success Header -->
+            <div class="result-success-header">
+              <div class="success-icon-emblem">
+                <div class="success-pulse-ring"></div>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00f084" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <h2 class="result-title">Your 8D Audio is Ready!</h2>
+              <p class="result-subtitle">Immersive 360° Binaural Spatial Master Rendered</p>
+            </div>
+
+            <!-- Large Glassmorphism Artwork Card -->
+            <div class="result-hero-card">
+              <div class="result-disc-box">
+                <div class="result-disc-grooves" id="result-disc">
+                  <div class="result-disc-art">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00f084" stroke-width="2">
+                      <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                      <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+                    </svg>
+                  </div>
+                </div>
+                <span class="badge-8d-luminous">8D MASTER</span>
+              </div>
+
+              <!-- Track Metadata -->
+              <div class="result-track-details">
+                <h3 class="result-track-name" id="result-song-title">Midnight City_8D.wav</h3>
+                <div class="result-meta-chips">
+                  <span class="meta-chip">WAV • 24-bit Hi-Res</span>
+                  <span class="meta-chip" id="result-meta-duration">4:02</span>
+                  <span class="meta-chip" id="result-meta-size">38.4 MB</span>
+                </div>
+              </div>
+
+              <!-- Prominent Waveform Player -->
+              <div class="result-player-box">
+                <button class="result-play-btn" id="btn-result-play" aria-label="Play converted audio">
+                  <svg id="result-play-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                  </svg>
+                </button>
+                <div class="result-waveform-wrapper">
+                  <canvas id="result-waveform-canvas" width="250" height="42"></canvas>
+                  <div class="result-time-row">
+                    <span id="result-time-current">0:00</span>
+                    <span id="result-time-total">4:02</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Four Action Buttons -->
+            <div class="result-actions-grid">
+              
+              <!-- Action 1: Play -->
+              <button class="action-card-btn action-play-primary" id="btn-result-action-play">
+                <div class="action-icon-circle bg-purple">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                  </svg>
+                </div>
+                <span>Play 8D</span>
+              </button>
+
+              <!-- Action 2: Save / Download -->
+              <button class="action-card-btn action-save-primary" id="btn-result-action-save">
+                <div class="action-icon-circle bg-green">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                </div>
+                <span>Save</span>
+              </button>
+
+              <!-- Action 3: Share -->
+              <button class="action-card-btn" id="btn-result-action-share">
+                <div class="action-icon-circle bg-blue">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                  </svg>
+                </div>
+                <span>Share</span>
+              </button>
+
+              <!-- Action 4: Convert Another -->
+              <button class="action-card-btn" id="btn-result-action-another">
+                <div class="action-icon-circle bg-cyan">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <polyline points="1 20 1 14 7 14"></polyline>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                  </svg>
+                </div>
+                <span>New</span>
+              </button>
+
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Tab / Screen: MY AUDIO SCREEN -->
+        <section class="tab-pane" id="tab-my-audio">
+          <div class="library-screen-layout">
+            
+            <!-- Top Header & Actions -->
+            <div class="library-header-row">
+              <h2 class="library-title">My Audio</h2>
+              <div class="library-header-actions">
+                <button class="icon-btn" id="btn-toggle-library-search" aria-label="Search my audio">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </button>
+                <button class="icon-btn" id="btn-library-sort" aria-label="Sort library">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="4" y1="6" x2="20" y2="6"></line>
+                    <line x1="4" y1="12" x2="14" y2="12"></line>
+                    <line x1="4" y1="18" x2="8" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Inline Search Box -->
+            <div class="library-search-container" id="library-search-box">
+              <div class="search-input-box library-search-input">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="input-library-search" placeholder="Search title or format..." />
+                <button class="search-clear-btn" id="btn-clear-library-search">✕</button>
+              </div>
+            </div>
+
+            <!-- Filter Tabs (All, 8D Converted, Original) -->
+            <div class="library-filter-row" id="library-filter-tabs">
+              <button class="filter-pill active" data-filter="all">
+                <span>All Tracks</span>
+                <span class="pill-count" id="count-all">3</span>
+              </button>
+              <button class="filter-pill" data-filter="8d">
+                <span>8D Converted</span>
+                <span class="pill-count" id="count-8d">2</span>
+              </button>
+              <button class="filter-pill" data-filter="original">
+                <span>Original</span>
+                <span class="pill-count" id="count-orig">1</span>
+              </button>
+            </div>
+
+            <!-- Library Tracks Vertical List -->
+            <div class="library-tracks-vertical-list" id="library-tracks-list"></div>
+
+          </div>
+        </section>
+
+        <!-- Tab / Screen: FAVORITES SCREEN -->
+        <section class="tab-pane" id="tab-favorites">
+          <div class="favorites-screen-layout">
+            
+            <!-- Top Header with Glowing Star -->
+            <div class="favorites-header-row">
+              <div class="fav-header-left">
+                <div class="fav-star-emblem">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="1">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                </div>
+                <h2 class="favorites-title">Favorites</h2>
+              </div>
+              <span class="badge-count" id="fav-total-count">2 saved</span>
+            </div>
+
+            <!-- Featured Favorite Audio Card -->
+            <div class="fav-featured-card" id="fav-featured-card">
+              <div class="fav-featured-glow-bg"></div>
+              <div class="fav-featured-art-box">
+                <div class="fav-featured-disc" id="fav-featured-disc">
+                  <div class="fav-featured-center">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                  </div>
+                </div>
+                <span class="badge-8d-star">⭐ 8D MASTER</span>
+              </div>
+
+              <div class="fav-featured-details">
+                <span class="fav-featured-tag">MOST PLAYED FAVORITE</span>
+                <h3 class="fav-featured-title" id="fav-featured-title">Starlight_Vocal_Mix.mp3</h3>
+                <p class="fav-featured-meta" id="fav-featured-meta">3:45 • 360° Binaural Spatial</p>
+              </div>
+
+              <button class="fav-featured-play-btn" id="btn-fav-featured-play" aria-label="Play featured favorite">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Section: Favorite Converted Tracks -->
+            <div class="fav-list-section">
+              <h4 class="fav-section-label">All Saved Favorites</h4>
+              <div class="empty-state" id="fav-empty-state" style="display: none;">
+                <div class="empty-icon" style="font-size: 2.2rem; margin-bottom: 10px;">⭐</div>
+                <h3>No Favorites Saved Yet</h3>
+                <p style="color: var(--text-muted); font-size: 0.84rem; margin-top: 4px;">Tap the heart or star on any track to add it to your favorites.</p>
+              </div>
+              <div class="favorites-tracks-list" id="favorites-tracks-list"></div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Tab / Screen: MAIN SETTINGS SCREEN -->
+        <section class="tab-pane" id="tab-settings">
+          <div class="settings-screen-layout">
+            
+            <!-- Top Header with App/Profile Emblem -->
+            <div class="settings-top-header">
+              <div class="settings-profile-card">
+                <div class="settings-avatar-box">
+                  <div class="settings-avatar-glow"></div>
+                  <div class="settings-avatar-icon">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#7c4dff" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                  </div>
+                </div>
+                <div class="settings-profile-info">
+                  <div class="profile-name-row">
+                    <h3 class="profile-name">8D Studio User</h3>
+                    <span class="badge-pro">PRO ACTIVE</span>
+                  </div>
+                  <p class="profile-subtitle">Spatial Binaural Converter</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Settings Group 1: Audio & Conversion Defaults -->
+            <div class="settings-group">
+              <h4 class="settings-group-title">Audio & Conversion Defaults</h4>
+              <div class="settings-glass-card">
+                
+                <!-- Appearance -->
+                <div class="settings-item-row">
+                  <div class="settings-item-left">
+                    <div class="settings-icon-pill bg-purple-glow">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
+                    </div>
+                    <div class="settings-item-text">
+                      <span class="settings-item-label">Appearance</span>
+                      <span class="settings-item-desc">Dark Obsidian & Neon</span>
+                    </div>
+                  </div>
+                  <select class="settings-select" id="setting-appearance">
+                    <option value="obsidian" selected>Obsidian Dark</option>
+                    <option value="cyber">Cyber Violet</option>
+                    <option value="deep-space">Deep Space</option>
+                  </select>
+                </div>
+
+                <!-- Default Output Format -->
+                <div class="settings-item-row">
+                  <div class="settings-item-left">
+                    <div class="settings-icon-pill bg-blue-glow">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                    </div>
+                    <div class="settings-item-text">
+                      <span class="settings-item-label">Default Output Format</span>
+                      <span class="settings-item-desc">Conversion file format</span>
+                    </div>
+                  </div>
+                  <select class="settings-select" id="setting-default-format">
+                    <option value="WAV" selected>WAV (Lossless)</option>
+                    <option value="MP3">MP3 (320 kbps)</option>
+                    <option value="M4A">M4A (AAC)</option>
+                  </select>
+                </div>
+
+                <!-- Default Audio Quality -->
+                <div class="settings-item-row">
+                  <div class="settings-item-left">
+                    <div class="settings-icon-pill bg-green-glow">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    </div>
+                    <div class="settings-item-text">
+                      <span class="settings-item-label">Default Audio Quality</span>
+                      <span class="settings-item-desc">HRTF Rendering precision</span>
+                    </div>
+                  </div>
+                  <select class="settings-select" id="setting-default-quality">
+                    <option value="ultra" selected>Ultra (24-bit Hi-Res)</option>
+                    <option value="high">High (320 kbps)</option>
+                    <option value="standard">Standard (192 kbps)</option>
+                  </select>
+                </div>
+
+                <!-- Auto Save to Device -->
+                <div class="settings-item-row">
+                  <div class="settings-item-left">
+                    <div class="settings-icon-pill bg-cyan-glow">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                    </div>
+                    <div class="settings-item-text">
+                      <span class="settings-item-label">Auto Save</span>
+                      <span class="settings-item-desc">Save converted file automatically</span>
+                    </div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="setting-toggle-autosave" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Settings Group 2: Notifications & General -->
+            <div class="settings-group">
+              <h4 class="settings-group-title">Preferences & General</h4>
+              <div class="settings-glass-card">
+                
+                <!-- Notifications -->
+                <div class="settings-item-row">
+                  <div class="settings-item-left">
+                    <div class="settings-icon-pill bg-purple-glow">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                    </div>
+                    <div class="settings-item-text">
+                      <span class="settings-item-label">Notifications</span>
+                      <span class="settings-item-desc">Render & export alerts</span>
+                    </div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="setting-toggle-notifications" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <!-- Language -->
+                <div class="settings-item-row">
+                  <div class="settings-item-left">
+                    <div class="settings-icon-pill bg-blue-glow">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                    </div>
+                    <div class="settings-item-text">
+                      <span class="settings-item-label">Language</span>
+                      <span class="settings-item-desc">App display language</span>
+                    </div>
+                  </div>
+                  <select class="settings-select" id="setting-language">
+                    <option value="en" selected>English (US)</option>
+                    <option value="ur">Urdu (اردو)</option>
+                    <option value="es">Español</option>
+                  </select>
+                </div>
+
+                <!-- Advanced Audio DSP Settings Screen Link -->
+                <div class="settings-item-row clickable-row" id="btn-open-advanced-dsp">
+                  <div class="settings-item-left">
+                    <div class="settings-icon-pill bg-green-glow">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+                    </div>
+                    <div class="settings-item-text">
+                      <span class="settings-item-label">Advanced DSP Settings</span>
+                      <span class="settings-item-desc">Stereo width, Bitrate, Limiter</span>
+                    </div>
+                  </div>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="chevron-icon"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Settings Group 3: Legal & About -->
+            <div class="settings-group">
+              <h4 class="settings-group-title">About & Legal</h4>
+              <div class="settings-glass-card">
+                
+                <!-- Privacy Policy -->
+                <div class="settings-item-row clickable-row" id="setting-row-privacy">
+                  <div class="settings-item-left">
+                    <div class="settings-icon-pill bg-purple-glow">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    </div>
+                    <div class="settings-item-text">
+                      <span class="settings-item-label">Privacy Policy</span>
+                      <span class="settings-item-desc">Data protection & local processing</span>
+                    </div>
+                  </div>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="chevron-icon"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+
+                <!-- Terms of Service -->
+                <div class="settings-item-row clickable-row" id="setting-row-terms">
+                  <div class="settings-item-left">
+                    <div class="settings-icon-pill bg-blue-glow">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <div class="settings-item-text">
+                      <span class="settings-item-label">Terms of Service</span>
+                      <span class="settings-item-desc">Usage terms & license</span>
+                    </div>
+                  </div>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="chevron-icon"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+
+                <!-- About 8D Audio Converter -->
+                <div class="settings-item-row clickable-row" id="setting-row-about">
+                  <div class="settings-item-left">
+                    <div class="settings-icon-pill bg-cyan-glow">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    </div>
+                    <div class="settings-item-text">
+                      <span class="settings-item-label">About 8D Audio Converter</span>
+                      <span class="settings-item-desc">Next-Gen Spatial Sound Engine</span>
+                    </div>
+                  </div>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="chevron-icon"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- App Version Footer -->
+            <div class="settings-version-footer">
+              <div class="version-badge">8D Audio Converter v1.2.0</div>
+              <p class="version-subtitle">Spatial HRTF Binaural Engine v2.4 • Built with Native Android</p>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Active Mini Player Bar -->
+      <div class="mini-player" id="mini-player" style="display: none;">
+        <div class="mini-vinyl-wrapper" id="mini-vinyl">
+          <div class="mini-vinyl-disk">
+            <div class="mini-vinyl-center"></div>
+          </div>
+        </div>
+        <div class="mini-player-info" id="mini-player-open">
+          <div class="mini-player-title" id="mini-title">Midnight City.mp3</div>
+          <div class="mini-player-status">
+            <span class="pulse-dot"></span>
+            <span>8D Spatial Active</span>
+          </div>
+        </div>
+        <div class="mini-player-controls">
+          <button class="icon-btn mini-btn" id="mini-btn-play" aria-label="Play or Pause">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Bottom Navigation Bar -->
+      <nav class="bottom-nav" id="bottom-navbar">
+        <button class="nav-item active" data-tab="tab-home" id="nav-home">
+          <div class="nav-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a3 3 0 003 3h2a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h2a3 3 0 003-3v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+            </svg>
+          </div>
+          <span class="nav-label">Home</span>
+        </button>
+
+        <button class="nav-item" data-tab="tab-my-audio" id="nav-my-audio">
+          <div class="nav-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="9" cy="14" r="2"></circle>
+              <path d="M11 14V8l6-2v6"></path>
+              <circle cx="15" cy="12" r="2"></circle>
+            </svg>
+          </div>
+          <span class="nav-label">My Audio</span>
+        </button>
+
+        <button class="nav-item" data-tab="tab-favorites" id="nav-favorites">
+          <div class="nav-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+          </div>
+          <span class="nav-label">Favorites</span>
+        </button>
+
+        <button class="nav-item" data-tab="tab-settings" id="nav-settings">
+          <div class="nav-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </div>
+          <span class="nav-label">Settings</span>
+        </button>
+      </nav>
+
+    </main>
+
+    <!-- Search Modal -->
+    <div class="dialog-overlay" id="search-modal" style="display: none;">
+      <div class="dialog-card">
+        <div class="dialog-header">
+          <h3>Search Audio</h3>
+          <button class="icon-btn-close" id="btn-close-search">✕</button>
+        </div>
+        <div class="search-input-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="search-input" placeholder="Search track name..." />
+        </div>
+        <div class="search-results-list" id="search-results"></div>
+      </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div class="dialog-overlay" id="qr-modal" style="display: none;">
+      <div class="dialog-card qr-card">
+        <div class="dialog-header">
+          <h3>Open on Mobile Phone</h3>
+          <button class="icon-btn-close" id="btn-close-qr">✕</button>
+        </div>
+        <p class="qr-description">Scan this QR code with your phone's camera (same Wi-Fi) to test with headphones:</p>
+        <div class="qr-code-wrapper" id="qr-canvas-box"></div>
+        <div class="mobile-url-box">
+          <code id="mobile-network-url">http://192.168.10.20:5173</code>
+          <button class="copy-btn" id="btn-copy-url">Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Drawer Menu -->
+    <div class="drawer-overlay" id="side-drawer" style="display: none;">
+      <div class="drawer-content">
+        <div class="drawer-header">
+          <div class="drawer-logo-row">
+            <div class="logo-icon-box">8D</div>
+            <div>
+              <h3>8D Audio Converter</h3>
+              <p>Pro Spatial Audio Studio</p>
+            </div>
+          </div>
+          <button class="icon-btn-close" id="btn-close-drawer">✕</button>
+        </div>
+
+        <nav class="drawer-nav">
+          <a href="#" class="drawer-item active" data-drawer-tab="tab-home">
+            <span class="drawer-icon">🏠</span> Home
+          </a>
+          <a href="#" class="drawer-item" data-drawer-tab="tab-my-audio">
+            <span class="drawer-icon">🎵</span> My 8D Library
+          </a>
+          <a href="#" class="drawer-item" data-drawer-tab="tab-favorites">
+            <span class="drawer-icon">❤️</span> Favorites
+          </a>
+          <a href="#" class="drawer-item" data-drawer-tab="tab-settings">
+            <span class="drawer-icon">⚙️</span> Settings
+          </a>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Processing Overlay Dialog -->
+    <div class="dialog-overlay" id="processing-overlay" style="display: none;">
+      <div class="dialog-card processing-card">
+        <div class="spinner-8d">
+          <div class="orbit-dot dot-1"></div>
+          <div class="orbit-dot dot-2"></div>
+        </div>
+        <h3 id="processing-title">Converting to 8D Audio...</h3>
+        <p id="processing-sub">Generating 360° Binaural Trajectory & Acoustic Space</p>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="export-progress-bar" style="width: 0%;"></div>
+        </div>
+        <span class="progress-percent" id="export-percent">0%</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>

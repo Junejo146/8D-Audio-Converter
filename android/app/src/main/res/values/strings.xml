@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">8D Audio Converter</string>
+    <string name="title_activity_main">8D Audio Converter</string>
+    <string name="package_name">com.audioconverter.eightd</string>
+    <string name="custom_url_scheme">com.audioconverter.eightd</string>
+</resources>

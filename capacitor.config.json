@@ -1,0 +1,9 @@
+{
+  "appId": "com.audioconverter.eightd",
+  "appName": "8D Audio Converter",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}
