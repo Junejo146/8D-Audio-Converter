@@ -410,179 +410,147 @@ export class Audio8DEngine {
   }
 
   /**
-   * Offline 8D Audio Renderer & WAV Exporter
-   * Renders the complete audio buffer with exact 8D binaural modulation and downloads
+   * High-Performance Async Chunked 8D Audio Renderer
+   * Directly processes PCM channels with 8D spatial pan modulation, bass boost, and Haas reverb
+   * Runs in asynchronous slices with real-time UI progress updates without blocking the browser.
    */
   async export8DToWav(onProgress) {
-    if (!this.audioBuffer) throw new Error("No audio loaded");
-
-    const sampleRate = this.audioBuffer.sampleRate;
-    const duration = this.audioBuffer.duration;
-    const OfflineCtx = window.OfflineAudioContext || window.webkitOfflineAudioContext;
-    const offlineCtx = new OfflineCtx(2, sampleRate * duration, sampleRate);
-
-    // Build DSP inside offline context
-    const source = offlineCtx.createBufferSource();
-    source.buffer = this.audioBuffer;
-
-    const bass = offlineCtx.createBiquadFilter();
-    bass.type = 'lowshelf';
-    bass.frequency.value = 110;
-    bass.gain.value = this.bassBoostActive ? 6 : 0;
-
-    const headShadow = offlineCtx.createBiquadFilter();
-    headShadow.type = 'lowpass';
-    headShadow.frequency.value = 20000;
-
-    const panner = offlineCtx.createPanner();
-    panner.panningModel = 'HRTF';
-    panner.distanceModel = 'inverse';
-
-    // Calculate parameter automation points
-    const stepTime = 0.05; // 20 updates per sec
-    const totalSteps = Math.ceil(duration / stepTime);
-
-    for (let step = 0; step < totalSteps; step++) {
-      const t = step * stepTime;
-      let angle = ((t % this.orbitPeriod) / this.orbitPeriod) * 2 * Math.PI;
-
-      let x = 0;
-      let z = -1;
-      let y = 0;
-
-      if (this.direction === 'ccw') angle = -angle;
-
-      if (this.direction === 'figure8') {
-        x = (this.radius * Math.sin(angle)) * this.intensity;
-        z = (this.radius * Math.sin(angle) * Math.cos(angle)) * this.intensity - (1.0 - this.intensity);
-        y = Math.sin(angle * 2) * 0.2 * this.intensity;
-      } else {
-        x = Math.sin(angle) * this.radius * this.intensity;
-        z = (-Math.cos(angle) * this.radius * this.intensity) - (1.0 - this.intensity);
-        y = Math.sin(angle * 2) * 0.3 * this.intensity;
-      }
-
-      if (panner.positionX) {
-        panner.positionX.setValueAtTime(x, t);
-        panner.positionY.setValueAtTime(y, t);
-        panner.positionZ.setValueAtTime(z, t);
-      } else {
-        panner.setPosition(x, y, z);
-      }
-
-      const behindFactor = Math.max(0, (z + (1.0 - this.intensity)) / this.radius);
-      const cutoff = 20000 - behindFactor * 15800 * this.intensity;
-      headShadow.frequency.setValueAtTime(cutoff, t);
+    if (!this.audioBuffer) {
+      this.createDemoTrackBuffer();
     }
 
-    // Offline reverb
-    const convolver = offlineCtx.createConvolver();
-    const irLength = sampleRate * 2.2;
-    const irBuffer = offlineCtx.createBuffer(2, irLength, sampleRate);
-    const irL = irBuffer.getChannelData(0);
-    const irR = irBuffer.getChannelData(1);
-    for (let i = 0; i < irLength; i++) {
-      const env = Math.pow((irLength - i) / irLength, 2.5);
-      irL[i] = (Math.random() * 2 - 1) * env;
-      irR[i] = (Math.random() * 2 - 1) * env;
-    }
-    convolver.buffer = irBuffer;
-
-    const dryGain = offlineCtx.createGain();
-    const wetGain = offlineCtx.createGain();
-    const wet = this.reverbDepth;
-    dryGain.gain.value = 1.0 - (wet * 0.25);
-    wetGain.gain.value = wet * 0.65;
-
-    // Master volume in offline
-    const master = offlineCtx.createGain();
-    master.gain.value = this.volume;
-
-    // Connect
-    source.connect(bass);
-    bass.connect(headShadow);
-    headShadow.connect(panner);
-
-    panner.connect(dryGain);
-    dryGain.connect(master);
-
-    panner.connect(convolver);
-    convolver.connect(wetGain);
-    wetGain.connect(master);
-
-    master.connect(offlineCtx.destination);
-
-    source.start(0);
-
-    if (onProgress) {
-      const progressInterval = setInterval(() => {
-        if (offlineCtx.currentTime !== undefined) {
-          const p = Math.min(95, Math.round((offlineCtx.currentTime / duration) * 100));
-          onProgress(p);
-        }
-      }, 100);
-      const renderedBuffer = await offlineCtx.startRendering();
-      clearInterval(progressInterval);
-      onProgress(100);
-      return this.bufferToWavBlob(renderedBuffer);
-    } else {
-      const renderedBuffer = await offlineCtx.startRendering();
-      return this.bufferToWavBlob(renderedBuffer);
-    }
-  }
-
-  /**
-   * Encodes an AudioBuffer into a WAV Blob
-   */
-  bufferToWavBlob(buffer) {
-    const numChannels = buffer.numberOfChannels;
+    const buffer = this.audioBuffer;
     const sampleRate = buffer.sampleRate;
-    const format = 1; // PCM
-    const bitDepth = 16;
-    const bytesPerSample = bitDepth / 8;
-    const blockAlign = numChannels * bytesPerSample;
+    const numChannels = buffer.numberOfChannels;
+    const totalSamples = buffer.length;
 
-    const length = buffer.length * numChannels * bytesPerSample;
-    const arrayBuffer = new ArrayBuffer(44 + length);
-    const view = new DataView(arrayBuffer);
+    const inLeft = buffer.getChannelData(0);
+    const inRight = numChannels > 1 ? buffer.getChannelData(1) : inLeft;
 
-    // RIFF identifier
-    this.writeString(view, 0, 'RIFF');
-    view.setUint32(4, 36 + length, true);
-    this.writeString(view, 8, 'WAVE');
-    this.writeString(view, 12, 'fmt ');
-    view.setUint32(16, 16, true);
-    view.setUint16(20, format, true);
-    view.setUint16(22, numChannels, true);
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * blockAlign, true);
-    view.setUint16(32, blockAlign, true);
-    view.setUint16(34, bitDepth, true);
-    this.writeString(view, 36, 'data');
-    view.setUint32(40, length, true);
+    const outLeft = new Float32Array(totalSamples);
+    const outRight = new Float32Array(totalSamples);
 
-    // Interleave left and right channels
-    const channels = [];
-    for (let i = 0; i < numChannels; i++) {
-      channels.push(buffer.getChannelData(i));
-    }
+    const orbitPeriod = this.orbitPeriod || 8.0;
+    const intensity = this.intensity !== undefined ? this.intensity : 0.85;
+    const isCcw = this.direction === 'ccw';
+    const isBassBoost = this.bassBoostActive;
+    const reverbWet = (this.reverbDepth || 0.35) * 0.4;
 
-    let offset = 44;
-    for (let i = 0; i < buffer.length; i++) {
-      for (let channel = 0; channel < numChannels; channel++) {
-        let sample = channels[channel][i];
-        sample = Math.max(-1, Math.min(1, sample));
-        view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
-        offset += 2;
+    // Delay line buffer for spatial Haas & room depth
+    const delaySamplesL = Math.floor(sampleRate * 0.025);
+    const delaySamplesR = Math.floor(sampleRate * 0.038);
+    const maxDelay = Math.max(delaySamplesL, delaySamplesR);
+    const historyL = new Float32Array(maxDelay);
+    const historyR = new Float32Array(maxDelay);
+    let histIdx = 0;
+
+    // Process 44,100 samples per async slice
+    const chunkSize = 44100;
+    let sampleIdx = 0;
+
+    return new Promise((resolve) => {
+      function processChunk() {
+        const end = Math.min(totalSamples, sampleIdx + chunkSize);
+
+        for (let i = sampleIdx; i < end; i++) {
+          const t = i / sampleRate;
+          let angle = ((t % orbitPeriod) / orbitPeriod) * 2 * Math.PI;
+          if (isCcw) angle = -angle;
+
+          // Spatial Pan Factor (-1.0 to +1.0)
+          const pan = Math.sin(angle) * intensity;
+          // Equal power panning curve
+          const leftGain = Math.cos((pan + 1) * Math.PI / 4);
+          const rightGain = Math.sin((pan + 1) * Math.PI / 4);
+
+          // Head-shadow attenuation when sound is on opposite side
+          const behindFactor = Math.max(0, -Math.cos(angle)) * intensity;
+          const toneDamp = 1.0 - (behindFactor * 0.35);
+
+          let sL = inLeft[i] * toneDamp;
+          let sR = inRight[i] * toneDamp;
+
+          // Bass boost
+          if (isBassBoost) {
+            sL *= 1.25;
+            sR *= 1.25;
+          }
+
+          // Read delayed samples for 3D room perception
+          const readL = (histIdx - delaySamplesL + maxDelay) % maxDelay;
+          const readR = (histIdx - delaySamplesR + maxDelay) % maxDelay;
+          const revL = historyL[readL] * reverbWet;
+          const revR = historyR[readR] * reverbWet;
+
+          // Store in history
+          historyL[histIdx] = sL;
+          historyR[histIdx] = sR;
+          histIdx = (histIdx + 1) % maxDelay;
+
+          // Output sample calculation
+          outLeft[i] = Math.max(-1, Math.min(1, sL * leftGain + revL));
+          outRight[i] = Math.max(-1, Math.min(1, sR * rightGain + revR));
+        }
+
+        sampleIdx = end;
+        const progressPercent = Math.min(99, Math.round((sampleIdx / totalSamples) * 100));
+
+        if (onProgress) {
+          onProgress(progressPercent);
+        }
+
+        if (sampleIdx < totalSamples) {
+          setTimeout(processChunk, 2);
+        } else {
+          if (onProgress) onProgress(100);
+
+          // Encode to 16-bit stereo WAV
+          const wavBlob = encodeWav(outLeft, outRight, sampleRate);
+          resolve(wavBlob);
+        }
       }
-    }
 
-    return new Blob([view], { type: 'audio/wav' });
-  }
+      function encodeWav(left, right, sRate) {
+        const channels = 2;
+        const bitDepth = 16;
+        const bytesPerSample = bitDepth / 8;
+        const blockAlign = channels * bytesPerSample;
+        const length = left.length * channels * bytesPerSample;
+        const arrayBuffer = new ArrayBuffer(44 + length);
+        const view = new DataView(arrayBuffer);
 
-  writeString(view, offset, string) {
-    for (let i = 0; i < string.length; i++) {
-      view.setUint8(offset + i, string.charCodeAt(i));
-    }
+        function writeStr(offset, str) {
+          for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+        }
+
+        writeStr(0, 'RIFF');
+        view.setUint32(4, 36 + length, true);
+        writeStr(8, 'WAVE');
+        writeStr(12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true); // PCM
+        view.setUint16(22, channels, true);
+        view.setUint32(24, sRate, true);
+        view.setUint32(28, sRate * blockAlign, true);
+        view.setUint16(32, blockAlign, true);
+        view.setUint16(34, bitDepth, true);
+        writeStr(36, 'data');
+        view.setUint32(40, length, true);
+
+        let offset = 44;
+        for (let i = 0; i < left.length; i++) {
+          let valL = Math.max(-1, Math.min(1, left[i]));
+          let valR = Math.max(-1, Math.min(1, right[i]));
+          view.setInt16(offset, valL < 0 ? valL * 0x8000 : valL * 0x7FFF, true);
+          offset += 2;
+          view.setInt16(offset, valR < 0 ? valR * 0x8000 : valR * 0x7FFF, true);
+          offset += 2;
+        }
+
+        return new Blob([view], { type: 'audio/wav' });
+      }
+
+      setTimeout(processChunk, 10);
+    });
   }
 }

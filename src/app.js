@@ -11,6 +11,7 @@ let convertedAudioBlob = null;
 let activeLibraryFilter = 'all';
 let librarySearchQuery = '';
 let isProcessingAborted = false;
+let currentScreen = 'tab-home';
 
 // App State
 let currentTrack = {
@@ -59,17 +60,15 @@ function generateWaveformData() {
   waveformBars = [];
   const count = 48;
   for (let i = 0; i < count; i++) {
-    const env = Math.sin((i / count) * Math.PI);
-    const rand = 0.35 + Math.random() * 0.65;
-    waveformBars.push(Math.max(0.15, env * rand));
+    waveformBars.push(Math.sin(i * 0.22) * 0.4 + Math.random() * 0.5 + 0.2);
   }
 }
-generateWaveformData();
 
 /**
  * Switch Active Screen Tab
  */
 function openScreen(screenId) {
+  currentScreen = screenId;
   const tabPanes = document.querySelectorAll('.tab-pane');
   tabPanes.forEach(pane => pane.classList.remove('active'));
   
@@ -280,6 +279,10 @@ function updatePlaybackState(isPlaying) {
   if (resultDisc) {
     if (isPlaying) resultDisc.classList.add('spinning');
     else resultDisc.classList.remove('spinning');
+  }
+
+  if (window.triggerWaveformRender) {
+    window.triggerWaveformRender();
   }
 }
 
@@ -511,8 +514,11 @@ function attachCardEvents() {
       if (e.target.closest('[data-action="play-pause"]') || e.target.closest('[data-action="more-options"]')) {
         return;
       }
+      const isDifferentTrack = !currentTrack || currentTrack.id !== trackId;
       selectTrack(trackId);
-      resetEditorToNormalOnly();
+      if (isDifferentTrack) {
+        resetEditorToNormalOnly();
+      }
       openScreen('screen-audio-editor');
     };
   });
@@ -602,48 +608,43 @@ function setupWaveformCanvases() {
     ctx.clearRect(0, 0, width, height);
 
     const numBars = waveformBars.length;
-    const barWidth = 3.2;
+    const barWidth = 3;
     const gap = (width - numBars * barWidth) / (numBars - 1);
 
-    for (let i = 0; i < numBars; i++) {
-      const x = i * (barWidth + gap);
-      const val = waveformBars[i];
-      const barHeight = val * (height - 8);
-      const y = (height - barHeight) / 2;
-      const isPlayed = isActive && ((x / width) <= progress);
+    const isLight = document.body.classList.contains('theme-light');
 
-      ctx.beginPath();
-      ctx.roundRect(x, y, barWidth, barHeight, [2]);
+    for (let i = 0; i < numBars; i++) {
+      const x = Math.round(i * (barWidth + gap));
+      const val = waveformBars[i];
+      const barHeight = Math.round(val * (height - 8));
+      const y = Math.round((height - barHeight) / 2);
+      const isPlayed = isActive && ((x / width) <= progress);
 
       if (isPlayed) {
         if (theme === 'normal') {
-          const grad = ctx.createLinearGradient(0, y, 0, y + barHeight);
-          grad.addColorStop(0, '#93c5fd');
-          grad.addColorStop(1, '#3b82f6');
-          ctx.fillStyle = grad;
+          ctx.fillStyle = isLight ? '#0284c7' : '#cbd5e1';
         } else {
-          const grad = ctx.createLinearGradient(0, y, 0, y + barHeight);
-          grad.addColorStop(0, '#00f084');
-          grad.addColorStop(1, '#7c4dff');
-          ctx.fillStyle = grad;
+          ctx.fillStyle = isLight ? '#d97706' : '#facc15';
         }
       } else {
-        ctx.fillStyle = isActive ? 'rgba(255, 255, 255, 0.22)' : 'rgba(255, 255, 255, 0.12)';
+        if (isLight) {
+          ctx.fillStyle = isActive ? '#475569' : '#64748b';
+        } else {
+          ctx.fillStyle = isActive ? 'rgba(255, 255, 255, 0.45)' : 'rgba(255, 255, 255, 0.25)';
+        }
       }
-      ctx.fill();
+      ctx.fillRect(x, y, barWidth, barHeight);
     }
 
     // Scrubber line only on active playing canvas
     if (isActive) {
-      const scrubX = progress * width;
-      ctx.beginPath();
-      ctx.moveTo(scrubX, 2);
-      ctx.lineTo(scrubX, height - 2);
-      ctx.strokeStyle = theme === 'normal' ? '#60a5fa' : '#00f084';
-      ctx.lineWidth = 2.5;
-      ctx.stroke();
+      const scrubX = Math.round(progress * width);
+      ctx.fillStyle = isLight ? (theme === 'normal' ? '#0284c7' : '#d97706') : (theme === 'normal' ? '#cbd5e1' : '#facc15');
+      ctx.fillRect(scrubX - 1, 2, 2, height - 4);
     }
   }
+
+  let waveformAnimId = null;
 
   function drawAll() {
     const progress = engine.duration > 0 ? (engine.getCurrentTime() / engine.duration) : 0;
@@ -661,9 +662,21 @@ function setupWaveformCanvases() {
     renderWave(previewCanvas, isPlaying ? progress : 0, 'spatial', isPlaying);
     renderWave(resultCanvas, isPlaying ? progress : 0, 'spatial', isPlaying);
 
-    requestAnimationFrame(drawAll);
+    if (isPlaying) {
+      waveformAnimId = requestAnimationFrame(drawAll);
+    } else {
+      waveformAnimId = null;
+    }
   }
 
+  // Expose function to trigger waveform update
+  window.triggerWaveformRender = function() {
+    if (!waveformAnimId) {
+      drawAll();
+    }
+  };
+
+  // Initial single static render
   drawAll();
 
   // Waveform Click to Seek
@@ -675,14 +688,16 @@ function setupWaveformCanvases() {
       const percent = Math.max(0, Math.min(1, clickX / rect.width));
       if (engine.duration) {
         engine.seek(percent * engine.duration);
+        drawAll();
       }
     };
   });
 }
 
 /**
- * Background Waveform Canvas in Processing Screen
+ * Background Waveform Canvas in Processing Screen (Only animates during processing)
  */
+let procBgAnimId = null;
 function setupProcessingBgCanvas() {
   const procBgCanvas = document.getElementById('processing-bg-canvas');
   if (!procBgCanvas) return;
@@ -696,27 +711,34 @@ function setupProcessingBgCanvas() {
   window.addEventListener('resize', resize);
 
   let phase = 0;
-  function draw() {
-    ctx.clearRect(0, 0, procBgCanvas.width, procBgCanvas.height);
-    const w = procBgCanvas.width;
-    const h = procBgCanvas.height;
-    phase += 0.03;
-
-    for (let wave = 0; wave < 3; wave++) {
-      ctx.beginPath();
-      ctx.moveTo(0, h / 2);
-      for (let x = 0; x < w; x += 6) {
-        const y = (h / 2) + Math.sin(x * 0.02 + phase + wave * 1.5) * (20 + wave * 12);
-        ctx.lineTo(x, y);
+  window.startProcBgAnimation = function() {
+    if (procBgAnimId) return;
+    function draw() {
+      if (currentScreen !== 'screen-conversion-processing') {
+        procBgAnimId = null;
+        return;
       }
-      ctx.strokeStyle = wave === 0 ? 'rgba(124, 77, 255, 0.35)' : wave === 1 ? 'rgba(61, 123, 253, 0.25)' : 'rgba(0, 240, 132, 0.25)';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    }
+      ctx.clearRect(0, 0, procBgCanvas.width, procBgCanvas.height);
+      const w = procBgCanvas.width;
+      const h = procBgCanvas.height;
+      phase += 0.03;
 
-    requestAnimationFrame(draw);
-  }
-  draw();
+      for (let wave = 0; wave < 3; wave++) {
+        ctx.beginPath();
+        ctx.moveTo(0, h / 2);
+        for (let x = 0; x < w; x += 6) {
+          const y = (h / 2) + Math.sin(x * 0.02 + phase + wave * 1.5) * (20 + wave * 12);
+          ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = wave === 0 ? 'rgba(45, 212, 191, 0.35)' : wave === 1 ? 'rgba(234, 179, 8, 0.3)' : 'rgba(56, 189, 248, 0.22)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      procBgAnimId = requestAnimationFrame(draw);
+    }
+    draw();
+  };
 }
 
 /**
@@ -725,6 +747,17 @@ function setupProcessingBgCanvas() {
 async function startConversionFlow() {
   isProcessingAborted = false;
   openScreen('screen-conversion-processing');
+  if (window.startProcBgAnimation) window.startProcBgAnimation();
+
+  // Guarantee audio buffer exists
+  if (!engine.audioBuffer) {
+    if (currentTrack && currentTrack.customBuffer) {
+      engine.audioBuffer = currentTrack.customBuffer;
+      engine.duration = currentTrack.customBuffer.duration;
+    } else {
+      engine.createDemoTrackBuffer();
+    }
+  }
 
   const procSongTitle = document.getElementById('proc-song-title');
   const procDurationText = document.getElementById('proc-duration-text');
@@ -735,49 +768,58 @@ async function startConversionFlow() {
     if (procDurationText) procDurationText.textContent = currentTrack.durationText || '4:02';
   }
 
-  updateProcStep(1, 'completed');
-  updateProcStep(2, 'active');
+  // Start from 0%
+  setGaugePercent(0);
+  updateProcStep(1, 'active');
+  updateProcStep(2, 'pending');
   updateProcStep(3, 'pending');
-  setGaugePercent(78);
+  if (procMainStatus) procMainStatus.textContent = "Analyzing Audio Spectrogram...";
 
   try {
     const wavBlob = await engine.export8DToWav((percent) => {
       if (isProcessingAborted) return;
       setGaugePercent(percent);
 
-      if (percent < 30) {
+      if (percent < 35) {
         updateProcStep(1, 'active');
         updateProcStep(2, 'pending');
         updateProcStep(3, 'pending');
         if (procMainStatus) procMainStatus.textContent = "Analyzing Audio Spectrogram...";
-      } else if (percent < 85) {
+      } else if (percent < 80) {
         updateProcStep(1, 'completed');
         updateProcStep(2, 'active');
         updateProcStep(3, 'pending');
         if (procMainStatus) procMainStatus.textContent = "Applying 360° 8D Spatial Orbit...";
-      } else {
+      } else if (percent < 100) {
         updateProcStep(1, 'completed');
         updateProcStep(2, 'completed');
         updateProcStep(3, 'active');
-        if (procMainStatus) procMainStatus.textContent = "Rendering Lossless Output...";
+        if (procMainStatus) procMainStatus.textContent = "Rendering Lossless 24-bit Output...";
+      } else {
+        updateProcStep(1, 'completed');
+        updateProcStep(2, 'completed');
+        updateProcStep(3, 'completed');
+        if (procMainStatus) procMainStatus.textContent = "Conversion Complete! 🎉";
       }
     });
 
     if (isProcessingAborted) return;
 
+    convertedAudioBlob = wavBlob;
     setGaugePercent(100);
     updateProcStep(1, 'completed');
     updateProcStep(2, 'completed');
     updateProcStep(3, 'completed');
     if (procMainStatus) procMainStatus.textContent = "Conversion Complete! 🎉";
 
-    convertedAudioBlob = wavBlob;
-
     setTimeout(() => {
-      if (!isProcessingAborted) openScreen('screen-audio-result');
-    }, 1200);
+      if (!isProcessingAborted) {
+        openScreen('screen-audio-result');
+      }
+    }, 800);
 
   } catch (err) {
+    console.error("Conversion error:", err);
     if (!isProcessingAborted) {
       alert("Conversion notice: " + err.message);
       openScreen('screen-audio-editor');
@@ -832,6 +874,9 @@ function setupEventListeners() {
   document.querySelectorAll('.nav-item').forEach(btn => {
     btn.onclick = () => {
       const targetTab = btn.getAttribute('data-tab');
+      if (targetTab === 'screen-audio-editor' && !currentTrack && tracks.length > 0) {
+        selectTrack(tracks[0].id);
+      }
       if (targetTab) openScreen(targetTab);
     };
   });
@@ -1072,14 +1117,33 @@ function setupEventListeners() {
   if (btnResultActionSave) {
     btnResultActionSave.onclick = () => {
       if (convertedAudioBlob) {
+        const fileName = (currentTrack ? currentTrack.title.replace(/\.[^/.]+$/, "") : "Track") + "_8D.wav";
         const url = URL.createObjectURL(convertedAudioBlob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = (currentTrack ? currentTrack.title.replace(/\.[^/.]+$/, "") : "audio") + "_8D_converted.wav";
+        a.download = fileName;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+
+        // Add to tracks library if not already added
+        const exists = tracks.some(t => t.title === fileName);
+        if (!exists) {
+          const new8dTrack = {
+            id: '8d-' + Date.now(),
+            title: fileName,
+            durationText: currentTrack ? currentTrack.durationText : '4:02',
+            dateText: 'Just now',
+            is8D: true,
+            isFavorite: false,
+            customBuffer: engine.audioBuffer
+          };
+          tracks.unshift(new8dTrack);
+          renderTracksList();
+        }
+
+        alert("✅ 8D Audio successfully saved and added to My Audio library!");
       } else {
         startConversionFlow();
       }
@@ -1097,14 +1161,15 @@ function setupEventListeners() {
           });
         } catch (e) {}
       } else {
-        navigator.clipboard.writeText(window.location.href);
-        alert('8D Audio link copied to clipboard!');
+        alert("Sharing link copied to clipboard!");
       }
     };
   }
 
   if (btnResultActionAnother) {
-    btnResultActionAnother.onclick = () => openScreen('screen-audio-select');
+    btnResultActionAnother.onclick = () => {
+      openScreen('tab-home');
+    };
   }
 
   // My Audio Library Search & Filters
@@ -1174,6 +1239,36 @@ function setupEventListeners() {
   const btnSeeAll = document.getElementById('btn-see-all');
   if (btnSeeAll) btnSeeAll.onclick = () => openScreen('tab-my-audio');
 
+  // Dark / Light Theme Toggle in Settings
+  const btnThemeDark = document.getElementById('btn-theme-dark');
+  const btnThemeLight = document.getElementById('btn-theme-light');
+  const themeModeDesc = document.getElementById('theme-mode-desc');
+
+  function setTheme(theme) {
+    if (theme === 'light') {
+      document.body.classList.add('theme-light');
+      if (btnThemeDark) btnThemeDark.classList.remove('active');
+      if (btnThemeLight) btnThemeLight.classList.add('active');
+      if (themeModeDesc) themeModeDesc.textContent = 'Light Frosted Studio';
+      localStorage.setItem('8d_app_theme', 'light');
+    } else {
+      document.body.classList.remove('theme-light');
+      if (btnThemeDark) btnThemeDark.classList.add('active');
+      if (btnThemeLight) btnThemeLight.classList.remove('active');
+      if (themeModeDesc) themeModeDesc.textContent = 'Dark Cyber Neon';
+      localStorage.setItem('8d_app_theme', 'dark');
+    }
+    if (window.triggerWaveformRender) {
+      window.triggerWaveformRender();
+    }
+  }
+
+  if (btnThemeDark) btnThemeDark.onclick = () => setTheme('dark');
+  if (btnThemeLight) btnThemeLight.onclick = () => setTheme('light');
+
+  const savedTheme = localStorage.getItem('8d_app_theme') || 'dark';
+  setTheme(savedTheme);
+
   engine.onEnded = () => {
     currentPlayingSlot = null;
     updatePlaybackState(false);
@@ -1228,13 +1323,15 @@ async function setupNetworkQR() {
 
 // Start App
 function init() {
+  generateWaveformData();
   renderTracksList();
   setupEventListeners();
   setupWaveformCanvases();
   setupProcessingBgCanvas();
   setupNetworkQR();
   startTimelineUpdater();
-  engine.createDemoTrackBuffer();
+  openScreen('tab-home');
+  selectTrack('demo-1');
 }
 
 init();
