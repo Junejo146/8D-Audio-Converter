@@ -89,7 +89,7 @@ body {
   }
 }
 
-/* Topographic Contour Lines Background Layer */
+/* Topographic Contour Lines Background Layer (Moving Dynamic Neon Flow) */
 .topographic-background-layer {
   position: absolute;
   inset: 0;
@@ -98,6 +98,7 @@ body {
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
+  will-change: transform;
 }
 
 .topo-svg {
@@ -105,6 +106,128 @@ body {
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+/* Moving Background Elements & Keyframes */
+.topo-animated-group {
+  will-change: transform, opacity;
+}
+
+.topo-peak-top {
+  transform-origin: 350px 115px;
+  animation: peakPulseTop 16s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 8px rgba(45, 212, 191, 0.5));
+}
+
+.topo-peak-bottom {
+  transform-origin: 55px 700px;
+  animation: peakPulseBottom 18s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 10px rgba(0, 240, 132, 0.55));
+}
+
+.topo-waves-1 {
+  transform-origin: 200px 330px;
+  animation: waveDriftCyan 12s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+  filter: drop-shadow(0 0 10px rgba(45, 212, 191, 0.6));
+}
+
+.topo-waves-2 {
+  transform-origin: 200px 540px;
+  animation: waveDriftGreen 9s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate-reverse;
+  filter: drop-shadow(0 0 14px rgba(0, 240, 132, 0.85));
+}
+
+.topo-waves-3 {
+  transform-origin: 200px 380px;
+  animation: waveDriftGold 15s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.45));
+}
+
+@keyframes waveDriftGreen {
+  0% {
+    transform: translateY(0px) translateX(0px) scale(1) skewX(0deg);
+    opacity: 0.65;
+  }
+  25% {
+    transform: translateY(-28px) translateX(22px) scale(1.05, 1.1) skewX(3deg);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(20px) translateX(-26px) scale(0.95, 0.93) skewX(-2.5deg);
+    opacity: 0.7;
+  }
+  75% {
+    transform: translateY(-22px) translateX(30px) scale(1.07, 1.03) skewX(2deg);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translateY(26px) translateX(-18px) scale(1.03, 1.07) skewX(-2deg);
+    opacity: 0.65;
+  }
+}
+
+@keyframes waveDriftCyan {
+  0% {
+    transform: translateY(0px) translateX(0px) scale(1) skewY(0deg);
+    opacity: 0.55;
+  }
+  33% {
+    transform: translateY(26px) translateX(-24px) scale(1.06, 0.95) skewY(2.2deg);
+    opacity: 0.8;
+  }
+  66% {
+    transform: translateY(-22px) translateX(22px) scale(0.96, 1.05) skewY(-2.5deg);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(20px) translateX(-18px) scale(1.04, 0.97) skewY(1.8deg);
+    opacity: 0.75;
+  }
+}
+
+@keyframes waveDriftGold {
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(-16px) translateX(18px) scale(1.04);
+    opacity: 0.65;
+  }
+  100% {
+    transform: translateY(18px) translateX(-18px) scale(0.96);
+    opacity: 0.4;
+  }
+}
+
+@keyframes peakPulseTop {
+  0% {
+    transform: scale(1) translate(0, 0) rotate(0deg);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.12) translate(-16px, 14px) rotate(5deg);
+    opacity: 0.75;
+  }
+  100% {
+    transform: scale(0.94) translate(14px, -12px) rotate(-4deg);
+    opacity: 0.5;
+  }
+}
+
+@keyframes peakPulseBottom {
+  0% {
+    transform: scale(1) translate(0, 0) rotate(0deg);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.14) translate(18px, -16px) rotate(-5deg);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(0.92) translate(-16px, 12px) rotate(4deg);
+    opacity: 0.55;
+  }
 }
 
 .mobile-frame {

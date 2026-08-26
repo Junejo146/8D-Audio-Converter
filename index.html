@@ -22,17 +22,21 @@
       <svg class="topo-svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <radialGradient id="topoGlowTop" cx="80%" cy="12%" r="50%">
-            <stop offset="0%" stop-color="#1b4d58" stop-opacity="0.7"/>
-            <stop offset="50%" stop-color="#0c1821" stop-opacity="0.3"/>
-            <stop offset="100%" stop-color="#0c1821" stop-opacity="0"/>
+            <stop offset="0%" stop-color="#00f084" stop-opacity="0.35"/>
+            <stop offset="40%" stop-color="#1b4d58" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="#0a141c" stop-opacity="0"/>
           </radialGradient>
           <radialGradient id="topoGlowBottom" cx="20%" cy="85%" r="50%">
-            <stop offset="0%" stop-color="#163e48" stop-opacity="0.6"/>
-            <stop offset="60%" stop-color="#0c1821" stop-opacity="0.2"/>
-            <stop offset="100%" stop-color="#0c1821" stop-opacity="0"/>
+            <stop offset="0%" stop-color="#00f084" stop-opacity="0.4"/>
+            <stop offset="50%" stop-color="#163e48" stop-opacity="0.2"/>
+            <stop offset="100%" stop-color="#0a141c" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="topoGlowCenter" cx="50%" cy="50%" r="55%">
+            <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.15"/>
+            <stop offset="100%" stop-color="#0a141c" stop-opacity="0"/>
           </radialGradient>
           <pattern id="coordGrid" width="40" height="40" patternUnits="userSpaceOnUse">
-            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(45, 212, 191, 0.07)" stroke-width="0.75" />
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0, 240, 132, 0.08)" stroke-width="0.75" />
           </pattern>
         </defs>
         
@@ -41,9 +45,10 @@
         <rect width="100%" height="100%" fill="url(#coordGrid)"/>
         <rect width="100%" height="100%" fill="url(#topoGlowTop)"/>
         <rect width="100%" height="100%" fill="url(#topoGlowBottom)"/>
+        <rect width="100%" height="100%" fill="url(#topoGlowCenter)"/>
 
         <!-- Topographic Contour Elevation Rings (Top Right Peak) -->
-        <g class="topo-animated-group topo-peak-top" stroke="#2dd4bf" stroke-width="1.3" fill="none" opacity="0.45">
+        <g class="topo-animated-group topo-peak-top" stroke="#2dd4bf" stroke-width="1.5" fill="none" opacity="0.55">
           <ellipse cx="360" cy="110" rx="35" ry="22"/>
           <ellipse cx="355" cy="112" rx="65" ry="42"/>
           <ellipse cx="350" cy="115" rx="100" ry="68"/>
@@ -54,31 +59,40 @@
           <ellipse cx="295" cy="150" rx="385" ry="285"/>
         </g>
 
-        <!-- Dynamic Topographic Contour Curves (Center Terrain Waves 1) -->
-        <g class="topo-animated-group topo-waves-1" stroke="#2dd4bf" stroke-width="1.2" fill="none" opacity="0.38">
-          <path d="M -60 280 Q 70 240, 190 290 T 460 260"/>
-          <path d="M -60 320 Q 80 280, 200 330 T 460 300"/>
-          <path d="M -60 360 Q 90 320, 215 375 T 460 340"/>
-          <path d="M -60 400 Q 105 360, 230 415 T 460 385"/>
+        <!-- Dynamic Topographic Contour Curves (Upper Waves - Cyan/Teal) -->
+        <g class="topo-animated-group topo-waves-1" stroke="#2dd4bf" stroke-width="1.6" fill="none" opacity="0.55">
+          <path d="M -60 250 Q 70 200, 190 260 T 460 220"/>
+          <path d="M -60 290 Q 80 240, 200 300 T 460 265"/>
+          <path d="M -60 330 Q 90 280, 215 345 T 460 310"/>
+          <path d="M -60 375 Q 105 325, 230 390 T 460 355"/>
+          <path d="M -60 420 Q 115 370, 240 435 T 460 400"/>
         </g>
 
-        <!-- Dynamic Topographic Contour Curves (Center Terrain Waves 2) -->
-        <g class="topo-animated-group topo-waves-2" stroke="#16a34a" stroke-width="1.2" fill="none" opacity="0.4">
-          <path d="M -60 445 Q 120 405, 245 460 T 460 425"/>
-          <path d="M -60 490 Q 135 445, 260 505 T 460 470"/>
-          <path d="M -60 535 Q 150 490, 275 550 T 460 515"/>
-          <path d="M -60 580 Q 165 535, 290 595 T 460 560"/>
+        <!-- Dynamic Topographic Contour Curves (Center Glowing Green Waves) -->
+        <g class="topo-animated-group topo-waves-2" stroke="#00f084" stroke-width="1.8" fill="none" opacity="0.75">
+          <path d="M -60 450 Q 120 395, 245 465 T 460 420"/>
+          <path d="M -60 495 Q 135 440, 260 510 T 460 465"/>
+          <path d="M -60 540 Q 150 485, 275 555 T 460 510"/>
+          <path d="M -60 585 Q 165 530, 290 600 T 460 555"/>
+          <path d="M -60 630 Q 180 575, 305 645 T 460 600"/>
+          <path d="M -60 675 Q 195 620, 320 690 T 460 645"/>
         </g>
 
-        <!-- Topographic Contour Elevation Rings (Bottom Left Peak) -->
-        <g class="topo-animated-group topo-peak-bottom" stroke="#2dd4bf" stroke-width="1.3" fill="none" opacity="0.42">
-          <ellipse cx="45" cy="690" rx="40" ry="26"/>
-          <ellipse cx="50" cy="688" rx="75" ry="50"/>
-          <ellipse cx="55" cy="682" rx="118" ry="80"/>
-          <ellipse cx="62" cy="675" rx="168" ry="118"/>
-          <ellipse cx="70" cy="668" rx="222" ry="158"/>
-          <ellipse cx="80" cy="660" rx="282" ry="202"/>
-          <ellipse cx="90" cy="650" rx="348" ry="252"/>
+        <!-- Dynamic Topographic Contour Curves (Lower Sound Waves - Golden Accent) -->
+        <g class="topo-animated-group topo-waves-3" stroke="#facc15" stroke-width="1.4" fill="none" opacity="0.45">
+          <path d="M -60 360 Q 140 420, 260 350 T 460 390"/>
+          <path d="M -60 405 Q 155 465, 275 395 T 460 435"/>
+        </g>
+
+        <!-- Topographic Contour Elevation Rings (Bottom Left Peak - Emerald Glow) -->
+        <g class="topo-animated-group topo-peak-bottom" stroke="#00f084" stroke-width="1.6" fill="none" opacity="0.6">
+          <ellipse cx="45" cy="710" rx="40" ry="26"/>
+          <ellipse cx="50" cy="708" rx="75" ry="50"/>
+          <ellipse cx="55" cy="702" rx="118" ry="80"/>
+          <ellipse cx="62" cy="695" rx="168" ry="118"/>
+          <ellipse cx="70" cy="688" rx="222" ry="158"/>
+          <ellipse cx="80" cy="680" rx="282" ry="202"/>
+          <ellipse cx="90" cy="670" rx="348" ry="252"/>
         </g>
       </svg>
     </div>
