@@ -1462,6 +1462,134 @@
       </div>
     </div>
 
+    <!-- Track 3-Dots Action Sheet / Context Modal -->
+    <div class="dialog-overlay sheet-overlay" id="track-options-modal" style="display: none;">
+      <div class="dialog-card track-options-sheet">
+        <div class="sheet-drag-handle"></div>
+        <div class="track-sheet-header">
+          <div class="card-art-box mini-art">
+            <div class="card-disc" id="sheet-track-disc">
+              <div class="card-disc-dot"></div>
+            </div>
+          </div>
+          <div class="sheet-track-info">
+            <h4 id="sheet-track-title">Midnight City.mp3</h4>
+            <div class="sheet-track-meta" id="sheet-track-meta">4:02 • Today <span class="badge-8d">8D</span></div>
+          </div>
+          <button class="icon-btn-close" id="btn-close-track-options" aria-label="Close menu">✕</button>
+        </div>
+
+        <div class="sheet-options-list">
+          <!-- Option 1: Play / Pause -->
+          <button class="sheet-option-item" id="sheet-opt-play">
+            <div class="sheet-opt-icon" id="sheet-opt-play-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="6 3 20 12 6 21 6 3"></polygon>
+              </svg>
+            </div>
+            <div class="sheet-opt-text">
+              <span class="sheet-opt-title" id="sheet-opt-play-label">Play 8D Audio</span>
+              <span class="sheet-opt-desc">Listen in 360° Binaural Spatial Sound</span>
+            </div>
+          </button>
+
+          <!-- Option 2: 8D Editor -->
+          <button class="sheet-option-item" id="sheet-opt-edit">
+            <div class="sheet-opt-icon icon-cyan">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="21" x2="4" y2="14"></line>
+                <line x1="4" y1="10" x2="4" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12" y2="3"></line>
+                <line x1="20" y1="21" x2="20" y2="16"></line>
+                <line x1="20" y1="12" x2="20" y2="3"></line>
+                <line x1="1" y1="14" x2="7" y2="14"></line>
+                <line x1="9" y1="8" x2="15" y2="8"></line>
+                <line x1="17" y1="16" x2="23" y2="16"></line>
+              </svg>
+            </div>
+            <div class="sheet-opt-text">
+              <span class="sheet-opt-title">Open in 8D Studio</span>
+              <span class="sheet-opt-desc">Adjust speed, depth, reverb & bass</span>
+            </div>
+          </button>
+
+          <!-- Option 3: Favorites -->
+          <button class="sheet-option-item" id="sheet-opt-favorite">
+            <div class="sheet-opt-icon icon-fav" id="sheet-opt-fav-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </div>
+            <div class="sheet-opt-text">
+              <span class="sheet-opt-title" id="sheet-opt-fav-title">Add to Favorites</span>
+              <span class="sheet-opt-desc">Save to your quick favorites list</span>
+            </div>
+          </button>
+
+          <!-- Option 4: Export / Download -->
+          <button class="sheet-option-item" id="sheet-opt-export">
+            <div class="sheet-opt-icon icon-export">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+            </div>
+            <div class="sheet-opt-text">
+              <span class="sheet-opt-title">Preview & Export WAV</span>
+              <span class="sheet-opt-desc">Render & save high-definition 8D audio</span>
+            </div>
+          </button>
+
+          <!-- Option 5: Delete Audio -->
+          <button class="sheet-option-item danger-item" id="sheet-opt-delete">
+            <div class="sheet-opt-icon icon-danger">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+            </div>
+            <div class="sheet-opt-text">
+              <span class="sheet-opt-title text-danger">Delete Audio</span>
+              <span class="sheet-opt-desc text-danger-sub">Permanently remove track from library</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal Dialog -->
+    <div class="dialog-overlay" id="delete-confirm-modal" style="display: none;">
+      <div class="dialog-card delete-confirm-card">
+        <div class="delete-icon-pulse">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
+        </div>
+        <h3 class="delete-modal-title">Delete Audio Track?</h3>
+        <p class="delete-modal-desc">Are you sure you want to delete <strong id="delete-track-title">this audio</strong> from your library? This action cannot be undone.</p>
+        <div class="modal-buttons-row">
+          <button class="btn-cancel-action" id="btn-cancel-delete">Cancel</button>
+          <button class="btn-confirm-delete" id="btn-confirm-delete">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            Delete Audio
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Dynamic Toast Notification -->
+    <div class="app-toast" id="app-toast">
+      <span class="toast-icon" id="toast-icon">🗑️</span>
+      <span class="toast-message" id="toast-message">Audio deleted successfully</span>
+    </div>
+
   </div>
 
   <script type="module" src="./src/app.js"></script>

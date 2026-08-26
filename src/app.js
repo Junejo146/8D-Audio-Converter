@@ -13,18 +13,8 @@ let librarySearchQuery = '';
 let isProcessingAborted = false;
 let currentScreen = 'tab-home';
 
-// App State
-let currentTrack = {
-  id: 'demo-1',
-  title: 'Midnight City.mp3',
-  durationText: '4:02',
-  dateText: 'Today',
-  is8D: true,
-  isFavorite: false,
-  isBuiltInDemo: true
-};
-
-let tracks = [
+// Default Built-in Tracks
+const DEFAULT_TRACKS = [
   {
     id: 'demo-1',
     title: 'Midnight City.mp3',
@@ -53,6 +43,45 @@ let tracks = [
     isBuiltInDemo: true
   }
 ];
+
+function loadTracksFromStorage() {
+  try {
+    const raw = localStorage.getItem('8d_audio_tracks_library');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to load tracks from storage', e);
+  }
+  return [...DEFAULT_TRACKS];
+}
+
+function saveTracksToStorage() {
+  try {
+    const toSave = tracks.map(t => ({
+      id: t.id,
+      title: t.title,
+      durationText: t.durationText,
+      dateText: t.dateText,
+      is8D: t.is8D,
+      isFavorite: t.isFavorite,
+      isBuiltInDemo: t.isBuiltInDemo || false
+    }));
+    localStorage.setItem('8d_audio_tracks_library', JSON.stringify(toSave));
+  } catch (e) {
+    console.warn('Failed to save tracks to storage', e);
+  }
+}
+
+// App State
+let tracks = loadTracksFromStorage();
+let currentTrack = tracks[0] || null;
+let selectedOptionTrackId = null;
+let pendingDeleteTrackId = null;
+let toastTimer = null;
 
 // Waveform data cache
 let waveformBars = [];
@@ -422,18 +451,27 @@ function createTrackCardHtml(track) {
           ${track.is8D ? '<span class="badge-8d">8D</span>' : ''}
         </div>
       </div>
-      <button class="track-play-btn ${isPlaying ? 'playing' : ''}" data-action="play-pause" data-track-id="${track.id}" aria-label="Play">
-        ${isPlaying ? `
+      <div class="card-actions-box">
+        <button class="track-play-btn ${isPlaying ? 'playing' : ''}" data-action="play-pause" data-track-id="${track.id}" aria-label="Play">
+          ${isPlaying ? `
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+              <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+            </svg>
+          ` : `
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="6 3 20 12 6 21 6 3"></polygon>
+            </svg>
+          `}
+        </button>
+        <button class="btn-card-more" data-action="more-options" data-track-id="${track.id}" aria-label="Options">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <rect x="6" y="4" width="4" height="16" rx="1"></rect>
-            <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+            <circle cx="12" cy="5" r="2"></circle>
+            <circle cx="12" cy="12" r="2"></circle>
+            <circle cx="12" cy="19" r="2"></circle>
           </svg>
-        ` : `
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <polygon points="6 3 20 12 6 21 6 3"></polygon>
-          </svg>
-        `}
-      </button>
+        </button>
+      </div>
     </div>
   `;
 }
@@ -505,8 +543,7 @@ function attachCardEvents() {
     if (moreBtn) {
       moreBtn.onclick = (e) => {
         e.stopPropagation();
-        selectTrack(trackId);
-        openScreen('screen-audio-preview');
+        openTrackOptions(trackId);
       };
     }
 
@@ -522,6 +559,156 @@ function attachCardEvents() {
       openScreen('screen-audio-editor');
     };
   });
+}
+
+/**
+ * Toast Notification Helper
+ */
+function showToast(message, type = 'normal') {
+  const toast = document.getElementById('app-toast');
+  const msgEl = document.getElementById('toast-message');
+  const iconEl = document.getElementById('toast-icon');
+  if (!toast || !msgEl) return;
+
+  msgEl.textContent = message;
+  if (iconEl) {
+    if (type === 'danger') iconEl.textContent = '🗑️';
+    else if (type === 'fav') iconEl.textContent = '❤️';
+    else if (type === 'unfav') iconEl.textContent = '🤍';
+    else if (type === 'save') iconEl.textContent = '💾';
+    else iconEl.textContent = '✨';
+  }
+
+  toast.className = `app-toast show ${type === 'danger' ? 'toast-danger' : ''}`;
+
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3200);
+}
+
+/**
+ * 3-Dots Track Action Sheet Handlers
+ */
+function openTrackOptions(trackId) {
+  const track = tracks.find(t => t.id === trackId);
+  if (!track) return;
+  selectedOptionTrackId = trackId;
+
+  const modal = document.getElementById('track-options-modal');
+  const titleEl = document.getElementById('sheet-track-title');
+  const metaEl = document.getElementById('sheet-track-meta');
+  const discEl = document.getElementById('sheet-track-disc');
+  const playLabel = document.getElementById('sheet-opt-play-label');
+  const playIcon = document.getElementById('sheet-opt-play-icon');
+  const favTitle = document.getElementById('sheet-opt-fav-title');
+  const favIcon = document.getElementById('sheet-opt-fav-icon');
+
+  if (titleEl) titleEl.textContent = track.title;
+  if (metaEl) {
+    metaEl.innerHTML = `${track.durationText} • ${track.dateText} ${track.is8D ? '<span class="badge-8d">8D</span>' : '<span class="meta-chip">Original</span>'}`;
+  }
+
+  const isCurrentPlaying = currentTrack && currentTrack.id === track.id && engine.isPlaying;
+  if (discEl) {
+    discEl.classList.toggle('spinning', isCurrentPlaying);
+  }
+
+  if (playLabel) {
+    playLabel.textContent = isCurrentPlaying ? 'Pause Audio' : 'Play 8D Audio';
+  }
+  if (playIcon) {
+    playIcon.innerHTML = isCurrentPlaying ? `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+        <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+      </svg>
+    ` : `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <polygon points="6 3 20 12 6 21 6 3"></polygon>
+      </svg>
+    `;
+  }
+
+  if (favTitle) {
+    favTitle.textContent = track.isFavorite ? 'Remove from Favorites' : 'Add to Favorites';
+  }
+  if (favIcon) {
+    favIcon.innerHTML = track.isFavorite ? `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444" stroke-width="2">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+      </svg>
+    ` : `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+      </svg>
+    `;
+  }
+
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeTrackOptions() {
+  selectedOptionTrackId = null;
+  const modal = document.getElementById('track-options-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+/**
+ * Delete Audio Dialog Handlers
+ */
+function openDeleteConfirm(trackId) {
+  const track = tracks.find(t => t.id === trackId);
+  if (!track) return;
+  pendingDeleteTrackId = trackId;
+
+  closeTrackOptions();
+
+  const titleEl = document.getElementById('delete-track-title');
+  if (titleEl) titleEl.textContent = `"${track.title}"`;
+
+  const modal = document.getElementById('delete-confirm-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeDeleteConfirm() {
+  pendingDeleteTrackId = null;
+  const modal = document.getElementById('delete-confirm-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function executeDeleteTrack() {
+  if (!pendingDeleteTrackId) return;
+  const trackIdToDelete = pendingDeleteTrackId;
+  const trackToDelete = tracks.find(t => t.id === trackIdToDelete);
+  const trackTitle = trackToDelete ? trackToDelete.title : 'Audio';
+
+  // Stop playback if deleting active playing track
+  if (currentTrack && currentTrack.id === trackIdToDelete) {
+    if (engine.isPlaying) {
+      engine.pause();
+    }
+    currentPlayingSlot = null;
+    updatePlaybackState(false);
+  }
+
+  // Remove track from array
+  tracks = tracks.filter(t => t.id !== trackIdToDelete);
+  saveTracksToStorage();
+
+  // Reset or switch current track
+  if (currentTrack && currentTrack.id === trackIdToDelete) {
+    if (tracks.length > 0) {
+      selectTrack(tracks[0].id);
+    } else {
+      currentTrack = null;
+      updateNowPlayingUI();
+    }
+  }
+
+  closeDeleteConfirm();
+  renderTracksList();
+  showToast(`"${trackTitle}" deleted from library`, 'danger');
 }
 
 function selectTrack(trackId) {
@@ -915,8 +1102,10 @@ function setupEventListeners() {
           customBuffer: buffer
         };
         tracks.unshift(newTrack);
+        saveTracksToStorage();
         currentTrack = newTrack;
         renderTracksList();
+        showToast(`🎵 Loaded "${file.name}"`, "normal");
 
         resetEditorToNormalOnly();
         openScreen('screen-audio-editor');
@@ -1140,10 +1329,11 @@ function setupEventListeners() {
             customBuffer: engine.audioBuffer
           };
           tracks.unshift(new8dTrack);
+          saveTracksToStorage();
           renderTracksList();
         }
 
-        alert("✅ 8D Audio successfully saved and added to My Audio library!");
+        showToast("💾 8D Audio saved to My Audio library!", "save");
       } else {
         startConversionFlow();
       }
@@ -1268,6 +1458,99 @@ function setupEventListeners() {
 
   const savedTheme = localStorage.getItem('8d_app_theme') || 'dark';
   setTheme(savedTheme);
+
+  // Track 3-Dots Action Sheet Handlers
+  const btnCloseTrackOptions = document.getElementById('btn-close-track-options');
+  const trackOptionsModal = document.getElementById('track-options-modal');
+  const sheetOptPlay = document.getElementById('sheet-opt-play');
+  const sheetOptEdit = document.getElementById('sheet-opt-edit');
+  const sheetOptFavorite = document.getElementById('sheet-opt-favorite');
+  const sheetOptExport = document.getElementById('sheet-opt-export');
+  const sheetOptDelete = document.getElementById('sheet-opt-delete');
+
+  if (btnCloseTrackOptions) btnCloseTrackOptions.onclick = closeTrackOptions;
+  if (trackOptionsModal) {
+    trackOptionsModal.onclick = (e) => {
+      if (e.target === trackOptionsModal) closeTrackOptions();
+    };
+  }
+
+  if (sheetOptPlay) {
+    sheetOptPlay.onclick = () => {
+      if (selectedOptionTrackId) {
+        handleTrackPlayClick(selectedOptionTrackId);
+      }
+      closeTrackOptions();
+    };
+  }
+
+  if (sheetOptEdit) {
+    sheetOptEdit.onclick = () => {
+      if (selectedOptionTrackId) {
+        const isDifferentTrack = !currentTrack || currentTrack.id !== selectedOptionTrackId;
+        selectTrack(selectedOptionTrackId);
+        if (isDifferentTrack) {
+          resetEditorToNormalOnly();
+        }
+        openScreen('screen-audio-editor');
+      }
+      closeTrackOptions();
+    };
+  }
+
+  if (sheetOptFavorite) {
+    sheetOptFavorite.onclick = () => {
+      if (selectedOptionTrackId) {
+        const tr = tracks.find(t => t.id === selectedOptionTrackId);
+        if (tr) {
+          tr.isFavorite = !tr.isFavorite;
+          saveTracksToStorage();
+          renderTracksList();
+          showToast(tr.isFavorite ? `❤️ Added "${tr.title}" to Favorites` : `🤍 Removed "${tr.title}" from Favorites`, tr.isFavorite ? 'fav' : 'unfav');
+        }
+      }
+      closeTrackOptions();
+    };
+  }
+
+  if (sheetOptExport) {
+    sheetOptExport.onclick = () => {
+      if (selectedOptionTrackId) {
+        selectTrack(selectedOptionTrackId);
+        openScreen('screen-audio-preview');
+      }
+      closeTrackOptions();
+    };
+  }
+
+  if (sheetOptDelete) {
+    sheetOptDelete.onclick = () => {
+      if (selectedOptionTrackId) {
+        openDeleteConfirm(selectedOptionTrackId);
+      }
+    };
+  }
+
+  // Delete Confirmation Modal Handlers
+  const deleteConfirmModal = document.getElementById('delete-confirm-modal');
+  const btnCancelDelete = document.getElementById('btn-cancel-delete');
+  const btnConfirmDelete = document.getElementById('btn-confirm-delete');
+
+  if (btnCancelDelete) btnCancelDelete.onclick = closeDeleteConfirm;
+  if (btnConfirmDelete) btnConfirmDelete.onclick = executeDeleteTrack;
+  if (deleteConfirmModal) {
+    deleteConfirmModal.onclick = (e) => {
+      if (e.target === deleteConfirmModal) closeDeleteConfirm();
+    };
+  }
+
+  // Escape key closes modals
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeTrackOptions();
+      closeDeleteConfirm();
+    }
+  });
 
   engine.onEnded = () => {
     currentPlayingSlot = null;
