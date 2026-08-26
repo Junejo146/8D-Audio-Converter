@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="./src/assets/app_icon.png" />
   <link rel="stylesheet" href="./src/style.css" />
 </head>
 <body>
@@ -112,17 +113,7 @@
 
         <div class="brand-header-box">
           <div class="brand-icon-emblem">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="url(#brandGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <defs>
-                <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#2dd4bf" />
-                  <stop offset="100%" stop-color="#facc15" />
-                </linearGradient>
-              </defs>
-              <circle cx="12" cy="12" r="10"></circle>
-              <circle cx="12" cy="12" r="3" fill="#facc15"></circle>
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-            </svg>
+            <img src="./src/assets/app_icon.png" alt="8D Logo" class="brand-emblem-img" />
           </div>
           <h1 class="header-title">8D Audio Converter</h1>
         </div>
@@ -731,18 +722,7 @@
               </div>
             </div>
 
-            <!-- Mobile Connection Info Card -->
-            <div class="settings-group-card" id="card-open-qr-modal" style="cursor: pointer;">
-              <div class="setting-toggle-row">
-                <div class="setting-text">
-                  <h4>Connect Another Device</h4>
-                  <p>Show Wi-Fi QR Code & Network URL</p>
-                </div>
-                <div class="card-arrow">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </div>
-              </div>
-            </div>
+
 
           </div>
         </section>
@@ -1093,12 +1073,7 @@
               <div class="settings-profile-card">
                 <div class="settings-avatar-box">
                   <div class="settings-avatar-glow"></div>
-                  <div class="settings-avatar-icon">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                  </div>
+                  <img src="./src/assets/guitar_boy.png" alt="8D Guitar Boy" class="settings-avatar-img" />
                 </div>
                 <div class="settings-profile-info">
                   <div class="profile-name-row">
@@ -1431,50 +1406,129 @@
       </div>
     </div>
 
-    <!-- QR Code Modal -->
-    <div class="dialog-overlay" id="qr-modal" style="display: none;">
-      <div class="dialog-card qr-card">
-        <div class="dialog-header">
-          <h3>Open on Mobile Phone</h3>
-          <button class="icon-btn-close" id="btn-close-qr">✕</button>
-        </div>
-        <p class="qr-description">Scan this QR code with your phone's camera (same Wi-Fi) to test with headphones:</p>
-        <div class="qr-code-wrapper" id="qr-canvas-box"></div>
-        <div class="mobile-url-box">
-          <code id="mobile-network-url">http://192.168.10.20:5173</code>
-          <button class="copy-btn" id="btn-copy-url">Copy</button>
-        </div>
-      </div>
-    </div>
 
-    <!-- Sidebar Drawer Menu -->
+
+    <!-- Sidebar Drawer Menu (Top Left 3-Lines Hamburger Menu) -->
     <div class="drawer-overlay" id="side-drawer" style="display: none;">
       <div class="drawer-content">
+        
+        <!-- Drawer Header -->
         <div class="drawer-header">
           <div class="drawer-logo-row">
-            <div class="logo-icon-box">8D</div>
+            <div class="drawer-logo-emblem">
+              <img src="./src/assets/app_icon.png" alt="8D Logo" class="drawer-emblem-img" />
+            </div>
             <div>
-              <h3>8D Audio Converter</h3>
-              <p>Pro Spatial Audio Studio</p>
+              <h3 class="drawer-brand-title">8D Audio Converter</h3>
+              <p class="drawer-brand-sub">Spatial Sound Studio</p>
             </div>
           </div>
-          <button class="icon-btn-close" id="btn-close-drawer">✕</button>
+          <button class="icon-btn-close" id="btn-close-drawer" aria-label="Close menu">✕</button>
         </div>
 
+        <!-- Drawer User Profile Card -->
+        <div class="drawer-profile-card">
+          <div class="drawer-avatar-wrap">
+            <img src="./src/assets/guitar_boy.png" alt="User Avatar" class="drawer-avatar-img" />
+          </div>
+          <div class="drawer-user-info">
+            <h4>8D Studio Member</h4>
+            <span class="drawer-badge-pro">PRO ACTIVE</span>
+          </div>
+        </div>
+
+        <!-- Drawer Main Navigation Links -->
         <nav class="drawer-nav">
-          <a href="#" class="drawer-item active" data-drawer-tab="tab-home">
-            <span class="drawer-icon">🏠</span> Home
-          </a>
-          <a href="#" class="drawer-item" data-drawer-tab="tab-my-audio">
-            <span class="drawer-icon">🎵</span> My 8D Library
-          </a>
-          <a href="#" class="drawer-item" data-drawer-tab="tab-favorites">
-            <span class="drawer-icon">❤️</span> Favorites
-          </a>
-          <a href="#" class="drawer-item" data-drawer-tab="tab-settings">
-            <span class="drawer-icon">⚙️</span> Settings
-          </a>
+          <div class="drawer-section-label">MAIN NAVIGATION</div>
+
+          <button class="drawer-item active" data-drawer-tab="tab-home">
+            <div class="drawer-item-icon bg-cyan">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a3 3 0 003 3h2a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h2a3 3 0 003-3v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+              </svg>
+            </div>
+            <span>Home</span>
+          </button>
+
+          <button class="drawer-item" data-drawer-tab="screen-audio-editor">
+            <div class="drawer-item-icon bg-gold">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="21" x2="4" y2="14"></line>
+                <line x1="4" y1="10" x2="4" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12" y2="3"></line>
+                <line x1="20" y1="21" x2="20" y2="16"></line>
+                <line x1="20" y1="12" x2="20" y2="3"></line>
+                <line x1="1" y1="14" x2="7" y2="14"></line>
+                <line x1="9" y1="8" x2="15" y2="8"></line>
+                <line x1="17" y1="16" x2="23" y2="16"></line>
+              </svg>
+            </div>
+            <span>8D Studio (Editor)</span>
+          </button>
+
+          <button class="drawer-item" data-drawer-tab="tab-my-audio">
+            <div class="drawer-item-icon bg-blue">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="9" cy="14" r="2"></circle>
+                <path d="M11 14V8l6-2v6"></path>
+                <circle cx="15" cy="12" r="2"></circle>
+              </svg>
+            </div>
+            <span>My 8D Library</span>
+          </button>
+
+          <button class="drawer-item" data-drawer-tab="tab-favorites">
+            <div class="drawer-item-icon bg-pink">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </div>
+            <span>Favorites</span>
+          </button>
+
+          <button class="drawer-item" data-drawer-tab="tab-settings">
+            <div class="drawer-item-icon bg-purple">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+            </div>
+            <span>Settings</span>
+          </button>
+
+          <div class="drawer-section-label" style="margin-top: 14px;">EXTRAS & ABOUT</div>
+
+          <!-- Replay Intro -->
+          <button class="drawer-item" id="drawer-btn-replay-splash">
+            <div class="drawer-item-icon bg-gold">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+            </div>
+            <span>Replay 3D Intro Animation</span>
+          </button>
+
+          <!-- About App -->
+          <button class="drawer-item" id="drawer-btn-about">
+            <div class="drawer-item-icon bg-blue">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+            </div>
+            <span>About 8D Audio Studio</span>
+          </button>
         </nav>
+
+        <!-- Drawer Footer -->
+        <div class="drawer-footer">
+          <div class="drawer-version-tag">Version 1.2.0 (Release)</div>
+          <p>Next-Gen Spatial HRTF DSP Engine</p>
+        </div>
+
       </div>
     </div>
 

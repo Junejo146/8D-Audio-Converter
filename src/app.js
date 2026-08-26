@@ -1,6 +1,5 @@
 import { Audio8DEngine } from './audioEngine.js';
 import { init3DSplashScreen } from './splash3d.js';
-import QRCode from 'qrcode';
 
 // Initialize 8D Audio Engine
 const engine = new Audio8DEngine();
@@ -1307,7 +1306,8 @@ function setupEventListeners() {
   if (btnResultActionSave) {
     btnResultActionSave.onclick = () => {
       if (convertedAudioBlob) {
-        const fileName = (currentTrack ? currentTrack.title.replace(/\.[^/.]+$/, "") : "Track") + "_8D.wav";
+        const chosenFmt = localStorage.getItem('8d_output_format') || 'wav';
+        const fileName = (currentTrack ? currentTrack.title.replace(/\.[^/.]+$/, "") : "Track") + "_8D." + chosenFmt;
         const url = URL.createObjectURL(convertedAudioBlob);
         const a = document.createElement('a');
         a.href = url;
@@ -1412,6 +1412,126 @@ function setupEventListeners() {
     btnOpenAdvancedDsp.onclick = () => openScreen('screen-advanced-settings');
   }
 
+  // ===================================================
+  // ADVANCED SETTINGS INTERACTIVE CONTROLS
+  // ===================================================
+  const formatButtons = document.querySelectorAll('#picker-output-format .segment-btn');
+  const qualityPills = document.querySelectorAll('#picker-audio-quality .quality-pill');
+  const selectBitrate = document.getElementById('select-bitrate');
+  const selectSampleRate = document.getElementById('select-sample-rate');
+  const sliderStereoWidth = document.getElementById('slider-stereo-width');
+  const valStereoWidth = document.getElementById('val-stereo-width');
+  const selectReverbType = document.getElementById('select-reverb-type');
+  const switchHeadShadow = document.getElementById('switch-head-shadow');
+  const switchPeakLimiter = document.getElementById('switch-peak-limiter');
+
+  // 1. Output Audio Format Picker (WAV, MP3, M4A)
+  formatButtons.forEach(btn => {
+    btn.onclick = () => {
+      formatButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const fmt = btn.getAttribute('data-fmt') || 'wav';
+      localStorage.setItem('8d_output_format', fmt);
+      showToast(`🎼 Output Format set to ${fmt.toUpperCase()}`, 'normal');
+    };
+  });
+
+  // 2. Audio Quality Profile Picker (Standard, High, Ultra)
+  qualityPills.forEach(pill => {
+    pill.onclick = () => {
+      qualityPills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      const quality = pill.getAttribute('data-quality') || 'ultra';
+      localStorage.setItem('8d_audio_quality', quality);
+      
+      // Sync default bitrate suggestion
+      if (selectBitrate) {
+        if (quality === 'standard') selectBitrate.value = '192';
+        else if (quality === 'high') selectBitrate.value = '256';
+        else if (quality === 'ultra') selectBitrate.value = '320';
+        localStorage.setItem('8d_bitrate', selectBitrate.value);
+      }
+
+      showToast(`⚡ Audio Quality set to ${quality.toUpperCase()}`, 'normal');
+    };
+  });
+
+  // 3. Bitrate Dropdown
+  if (selectBitrate) {
+    selectBitrate.onchange = (e) => {
+      localStorage.setItem('8d_bitrate', e.target.value);
+      showToast(`🎚️ Bitrate set to ${e.target.value} kbps`, 'normal');
+    };
+  }
+
+  // 4. Sample Rate Dropdown
+  if (selectSampleRate) {
+    selectSampleRate.onchange = (e) => {
+      localStorage.setItem('8d_sample_rate', e.target.value);
+      showToast(`📻 Sample Rate set to ${(parseInt(e.target.value)/1000).toFixed(1)} kHz`, 'normal');
+    };
+  }
+
+  // 5. Stereo Width Slider
+  if (sliderStereoWidth && valStereoWidth) {
+    sliderStereoWidth.oninput = (e) => {
+      valStereoWidth.textContent = `${e.target.value}%`;
+      localStorage.setItem('8d_stereo_width', e.target.value);
+    };
+  }
+
+  // 6. Reverb Environment Simulation Dropdown
+  if (selectReverbType) {
+    selectReverbType.onchange = (e) => {
+      localStorage.setItem('8d_reverb_type', e.target.value);
+      showToast(`🏛️ Room Acoustics set to ${selectReverbType.options[selectReverbType.selectedIndex].text}`, 'normal');
+    };
+  }
+
+  // 7. Head-Shadow Filter & Peak Limiter Switches
+  if (switchHeadShadow) {
+    switchHeadShadow.onchange = (e) => {
+      localStorage.setItem('8d_head_shadow', e.target.checked ? 'true' : 'false');
+    };
+  }
+  if (switchPeakLimiter) {
+    switchPeakLimiter.onchange = (e) => {
+      localStorage.setItem('8d_peak_limiter', e.target.checked ? 'true' : 'false');
+    };
+  }
+
+  // Restore Saved Advanced Settings on Startup
+  const savedFmt = localStorage.getItem('8d_output_format') || 'wav';
+  formatButtons.forEach(btn => {
+    if (btn.getAttribute('data-fmt') === savedFmt) {
+      formatButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+  });
+
+  const savedQuality = localStorage.getItem('8d_audio_quality') || 'ultra';
+  qualityPills.forEach(pill => {
+    if (pill.getAttribute('data-quality') === savedQuality) {
+      qualityPills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+    }
+  });
+
+  const savedBitrate = localStorage.getItem('8d_bitrate');
+  if (savedBitrate && selectBitrate) selectBitrate.value = savedBitrate;
+
+  const savedSampleRate = localStorage.getItem('8d_sample_rate');
+  if (savedSampleRate && selectSampleRate) selectSampleRate.value = savedSampleRate;
+
+  const savedStereoWidth = localStorage.getItem('8d_stereo_width');
+  if (savedStereoWidth && sliderStereoWidth && valStereoWidth) {
+    sliderStereoWidth.value = savedStereoWidth;
+    valStereoWidth.textContent = `${savedStereoWidth}%`;
+  }
+
+  const savedReverbType = localStorage.getItem('8d_reverb_type');
+  if (savedReverbType && selectReverbType) selectReverbType.value = savedReverbType;
+
   const btnReplaySplash = document.getElementById('btn-replay-splash');
   if (btnReplaySplash) {
     btnReplaySplash.onclick = () => {
@@ -1436,6 +1556,69 @@ function setupEventListeners() {
 
   const btnSeeAll = document.getElementById('btn-see-all');
   if (btnSeeAll) btnSeeAll.onclick = () => openScreen('tab-my-audio');
+
+  // Top-Left 3-Lines Hamburger Menu Drawer Handlers
+  const btnMenu = document.getElementById('btn-menu');
+  const sideDrawer = document.getElementById('side-drawer');
+  const btnCloseDrawer = document.getElementById('btn-close-drawer');
+  const drawerItems = document.querySelectorAll('.drawer-item[data-drawer-tab]');
+  const drawerBtnReplaySplash = document.getElementById('drawer-btn-replay-splash');
+  const drawerBtnAbout = document.getElementById('drawer-btn-about');
+
+  function openSideDrawer() {
+    if (!sideDrawer) return;
+    sideDrawer.style.display = 'flex';
+    requestAnimationFrame(() => {
+      sideDrawer.classList.add('active');
+    });
+  }
+
+  function closeSideDrawer() {
+    if (!sideDrawer) return;
+    sideDrawer.classList.remove('active');
+    setTimeout(() => {
+      if (!sideDrawer.classList.contains('active')) {
+        sideDrawer.style.display = 'none';
+      }
+    }, 320);
+  }
+
+  if (btnMenu) btnMenu.onclick = openSideDrawer;
+  if (btnCloseDrawer) btnCloseDrawer.onclick = closeSideDrawer;
+
+  if (sideDrawer) {
+    sideDrawer.onclick = (e) => {
+      if (e.target === sideDrawer) {
+        closeSideDrawer();
+      }
+    };
+  }
+
+  drawerItems.forEach(item => {
+    item.onclick = () => {
+      const targetTab = item.getAttribute('data-drawer-tab');
+      if (targetTab) {
+        openScreen(targetTab);
+        drawerItems.forEach(d => d.classList.remove('active'));
+        item.classList.add('active');
+      }
+      closeSideDrawer();
+    };
+  });
+
+  if (drawerBtnReplaySplash) {
+    drawerBtnReplaySplash.onclick = () => {
+      closeSideDrawer();
+      init3DSplashScreen();
+    };
+  }
+
+  if (drawerBtnAbout) {
+    drawerBtnAbout.onclick = () => {
+      closeSideDrawer();
+      alert('8D Audio Converter v1.2.0 (Release)\n\n• High-Fidelity 360° Binaural HRTF Spatial Acoustic Synthesis\n• Real-Time Trajectory Speed & Depth Synthesis\n• Reverb & Multi-Band Bass Equalizer\n• 100% On-Device Processing');
+    };
+  }
 
   // Dark / Light Theme Toggle in Settings
   const btnThemeDark = document.getElementById('btn-theme-dark');
@@ -1591,27 +1774,6 @@ function startTimelineUpdater() {
   }, 200);
 }
 
-/**
- * QR Code Generator
- */
-async function setupNetworkQR() {
-  const currentHost = window.location.hostname || '192.168.10.20';
-  const currentPort = window.location.port || '5173';
-  const url = `http://${currentHost}:${currentPort}`;
-
-  const qrCanvasBox = document.getElementById('qr-canvas-box');
-  if (qrCanvasBox) {
-    const canvas = document.createElement('canvas');
-    await QRCode.toCanvas(canvas, url, {
-      width: 200,
-      margin: 1,
-      color: { dark: '#111118', light: '#ffffff' }
-    });
-    qrCanvasBox.innerHTML = '';
-    qrCanvasBox.appendChild(canvas);
-  }
-}
-
 // Start App
 function init() {
   generateWaveformData();
@@ -1619,7 +1781,6 @@ function init() {
   setupEventListeners();
   setupWaveformCanvases();
   setupProcessingBgCanvas();
-  setupNetworkQR();
   startTimelineUpdater();
   openScreen('tab-home');
   selectTrack('demo-1');

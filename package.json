@@ -17,6 +17,9 @@
     "three": "^0.185.1"
   },
   "devDependencies": {
+    "jpeg-js": "^0.4.4",
+    "pngjs": "^7.0.0",
+    "sharp": "^0.35.4",
     "vite": "^5.1.4"
   }
 }
