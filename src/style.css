@@ -4116,3 +4116,30 @@ body.theme-light .app-toast {
 body.theme-light .toast-message {
   color: #0f172a !important;
 }
+
+/* ==========================================================================
+   FULL 3D CINEMATIC ANIMATED SPLASH SCREEN
+   ========================================================================== */
+.splash-3d-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #061118;
+  z-index: 9999;
+  display: block;
+  overflow: hidden;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.splash-3d-overlay.splash-fade-out {
+  opacity: 0;
+  transform: scale(1.04);
+  pointer-events: none;
+}
+
+.splash-3d-overlay canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}

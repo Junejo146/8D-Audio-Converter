@@ -1,4 +1,5 @@
 import { Audio8DEngine } from './audioEngine.js';
+import { init3DSplashScreen } from './splash3d.js';
 import QRCode from 'qrcode';
 
 // Initialize 8D Audio Engine
@@ -1411,6 +1412,13 @@ function setupEventListeners() {
     btnOpenAdvancedDsp.onclick = () => openScreen('screen-advanced-settings');
   }
 
+  const btnReplaySplash = document.getElementById('btn-replay-splash');
+  if (btnReplaySplash) {
+    btnReplaySplash.onclick = () => {
+      init3DSplashScreen();
+    };
+  }
+
   const settingRowPrivacy = document.getElementById('setting-row-privacy');
   if (settingRowPrivacy) {
     settingRowPrivacy.onclick = () => alert('Privacy Policy: All 8D Audio conversion is processed locally on device.');
@@ -1615,6 +1623,13 @@ function init() {
   startTimelineUpdater();
   openScreen('tab-home');
   selectTrack('demo-1');
+
+  // Launch Full 3D Cinematic Animated Splash Screen
+  try {
+    init3DSplashScreen();
+  } catch (err) {
+    console.warn('3D Splash initialization warning:', err);
+  }
 }
 
 init();
