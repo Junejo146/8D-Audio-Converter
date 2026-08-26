@@ -13,50 +13,20 @@ let librarySearchQuery = '';
 let isProcessingAborted = false;
 let currentScreen = 'tab-home';
 
-// Default Built-in Tracks
-const DEFAULT_TRACKS = [
-  {
-    id: 'demo-1',
-    title: 'Midnight City.mp3',
-    durationText: '4:02',
-    dateText: 'Today',
-    is8D: true,
-    isFavorite: false,
-    isBuiltInDemo: true
-  },
-  {
-    id: 'demo-2',
-    title: 'Starlight_Vocal_Mix.mp3',
-    durationText: '3:45',
-    dateText: 'Yesterday',
-    is8D: true,
-    isFavorite: true,
-    isBuiltInDemo: true
-  },
-  {
-    id: 'demo-3',
-    title: 'Neon_Sunset_Synth.wav',
-    durationText: '0:24',
-    dateText: 'Live Demo',
-    is8D: true,
-    isFavorite: false,
-    isBuiltInDemo: true
-  }
-];
-
 function loadTracksFromStorage() {
   try {
     const raw = localStorage.getItem('8d_audio_tracks_library');
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+      if (Array.isArray(parsed)) {
+        // Filter out any legacy demo items if they were saved in previous runs
+        return parsed.filter(t => !t.isBuiltInDemo && !t.id.startsWith('demo-'));
       }
     }
   } catch (e) {
     console.warn('Failed to load tracks from storage', e);
   }
-  return [...DEFAULT_TRACKS];
+  return []; // Pure fresh app for real users!
 }
 
 function saveTracksToStorage() {
@@ -131,14 +101,22 @@ function openScreen(screenId) {
  * Update UI Text & Metadata
  */
 function updateNowPlayingUI() {
-  if (!currentTrack) return;
-  const durStr = currentTrack.durationText || formatTime(engine.duration || 24);
-
   const miniTitle = document.getElementById('mini-title');
   const editorSongTitle = document.getElementById('editor-song-title');
   const previewSongTitle = document.getElementById('preview-song-title');
   const procSongTitle = document.getElementById('proc-song-title');
   const resultSongTitle = document.getElementById('result-song-title');
+
+  if (!currentTrack) {
+    if (miniTitle) miniTitle.textContent = 'No Track Selected';
+    if (editorSongTitle) editorSongTitle.textContent = 'Select Audio File to Begin';
+    if (previewSongTitle) previewSongTitle.textContent = 'No Audio Selected';
+    if (procSongTitle) procSongTitle.textContent = 'Processing Audio...';
+    if (resultSongTitle) resultSongTitle.textContent = 'Converted_8D_Track.wav';
+    return;
+  }
+
+  const durStr = currentTrack.durationText || formatTime(engine.duration || 24);
 
   if (miniTitle) miniTitle.textContent = currentTrack.title;
   if (editorSongTitle) editorSongTitle.textContent = currentTrack.title;
@@ -334,7 +312,16 @@ function renderTracksList() {
   // 1. Home Recent Tracks
   const recentTracksList = document.getElementById('recent-tracks-list');
   if (recentTracksList) {
-    recentTracksList.innerHTML = tracks.map(track => createTrackCardHtml(track)).join('');
+    if (tracks.length > 0) {
+      recentTracksList.innerHTML = tracks.slice(0, 5).map(track => createTrackCardHtml(track)).join('');
+    } else {
+      recentTracksList.innerHTML = `
+        <div class="empty-recent-box" style="padding: 24px 16px; text-align: center; background: rgba(20, 31, 44, 0.6); border: 1px dashed rgba(45, 212, 191, 0.25); border-radius: 16px; margin-top: 4px;">
+          <div style="font-size: 2rem; margin-bottom: 6px;">🎵</div>
+          <h4 style="color: #ffffff; font-size: 0.92rem; font-weight: 700;">No Recent Audio</h4>
+          <p style="color: var(--text-muted); font-size: 0.76rem; margin-top: 4px; line-height: 1.4;">Tap "+ Select Audio" above to import your first song for 8D conversion.</p>
+        </div>`;
+    }
   }
 
   // 2. My Audio Library
@@ -363,15 +350,16 @@ function renderTracksList() {
       libraryTracksList.innerHTML = filtered.map(track => createLibraryCardHtml(track)).join('');
     } else {
       libraryTracksList.innerHTML = `
-        <div class="empty-state" style="padding: 30px 10px; text-align: center;">
-          <div style="font-size: 2rem; margin-bottom: 8px;">🔍</div>
-          <h4>No Audio Found</h4>
-          <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 4px;">Try changing your search or filter tab.</p>
+        <div class="empty-state" style="padding: 40px 14px; text-align: center;">
+          <div style="font-size: 2.4rem; margin-bottom: 8px;">📂</div>
+          <h4 style="color: #ffffff; font-size: 0.98rem; font-weight: 700;">Your Library is Empty</h4>
+          <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 4px;">Import audio files to build your converted 8D spatial music library.</p>
         </div>`;
     }
   }
 
   // 3. Favorites List
+  const favFeaturedCard = document.getElementById('fav-featured-card');
   const favoritesTracksList = document.getElementById('favorites-tracks-list');
   const favEmptyState = document.getElementById('fav-empty-state');
   const favTotalCount = document.getElementById('fav-total-count');
@@ -383,8 +371,15 @@ function renderTracksList() {
   const favs = tracks.filter(t => t.isFavorite);
   if (favTotalCount) favTotalCount.textContent = `${favs.length} saved`;
 
-  const featuredFav = favs[0] || tracks[1] || tracks[0];
-  if (featuredFav) {
+  if (favs.length > 0) {
+    if (favFeaturedCard) favFeaturedCard.style.display = 'flex';
+    if (favEmptyState) favEmptyState.style.display = 'none';
+    if (favoritesTracksList) {
+      favoritesTracksList.style.display = 'flex';
+      favoritesTracksList.innerHTML = favs.map(track => createLibraryCardHtml(track)).join('');
+    }
+
+    const featuredFav = favs[0];
     if (favFeaturedTitle) favFeaturedTitle.textContent = featuredFav.title;
     if (favFeaturedMeta) favFeaturedMeta.textContent = `${featuredFav.durationText} • 360° Binaural Spatial`;
     
@@ -407,16 +402,12 @@ function renderTracksList() {
         handleTrackPlayClick(featuredFav.id);
       };
     }
-  }
-
-  if (favoritesTracksList && favEmptyState) {
-    if (favs.length > 0) {
-      favEmptyState.style.display = 'none';
-      favoritesTracksList.style.display = 'flex';
-      favoritesTracksList.innerHTML = favs.map(track => createLibraryCardHtml(track)).join('');
-    } else {
-      favEmptyState.style.display = 'flex';
+  } else {
+    if (favFeaturedCard) favFeaturedCard.style.display = 'none';
+    if (favEmptyState) favEmptyState.style.display = 'flex';
+    if (favoritesTracksList) {
       favoritesTracksList.style.display = 'none';
+      favoritesTracksList.innerHTML = '';
     }
   }
 
@@ -1783,7 +1774,10 @@ function init() {
   setupProcessingBgCanvas();
   startTimelineUpdater();
   openScreen('tab-home');
-  selectTrack('demo-1');
+
+  if (tracks.length > 0) {
+    selectTrack(tracks[0].id);
+  }
 
   // Launch Full 3D Cinematic Animated Splash Screen
   try {

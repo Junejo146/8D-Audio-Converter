@@ -308,8 +308,8 @@
               <div class="mini-center-dot"></div>
             </div>
             <div class="banner-text">
-              <h3 class="editor-track-name" id="editor-song-title">Midnight City.mp3</h3>
-              <p class="editor-track-meta"><span id="editor-duration-text">4:02</span> • Lossless Input</p>
+              <h3 class="editor-track-name" id="editor-song-title">Select Audio File</h3>
+              <p class="editor-track-meta"><span id="editor-duration-text">0:00</span> • Ready to Import</p>
             </div>
             <div class="banner-badge" id="banner-active-mode">Stereo Mode</div>
           </div>
@@ -502,8 +502,8 @@
 
           <!-- Track Title & Artist -->
           <div class="preview-track-info">
-            <h3 class="preview-song-title" id="preview-song-title">Midnight City.mp3</h3>
-            <p class="preview-artist-name" id="preview-artist-name">Spatial Audio Master</p>
+            <h3 class="preview-song-title" id="preview-song-title">Audio Preview</h3>
+            <p class="preview-artist-name" id="preview-artist-name">Spatial 360° Binaural Master</p>
           </div>
 
           <!-- Realistic Audio Waveform Timeline -->
@@ -870,11 +870,11 @@
 
               <!-- Track Metadata -->
               <div class="result-track-details">
-                <h3 class="result-track-name" id="result-song-title">Midnight City_8D.wav</h3>
+                <h3 class="result-track-name" id="result-song-title">Converted_8D_Track.wav</h3>
                 <div class="result-meta-chips">
-                  <span class="meta-chip">WAV • 24-bit Hi-Res</span>
-                  <span class="meta-chip" id="result-meta-duration">4:02</span>
-                  <span class="meta-chip" id="result-meta-size">38.4 MB</span>
+                  <span class="meta-chip">Hi-Res Spatial Output</span>
+                  <span class="meta-chip" id="result-meta-duration">0:00</span>
+                  <span class="meta-chip" id="result-meta-size">Lossless</span>
                 </div>
               </div>
 
@@ -1020,11 +1020,11 @@
                 </div>
                 <h2 class="favorites-title">Favorites</h2>
               </div>
-              <span class="badge-count" id="fav-total-count">2 saved</span>
+              <span class="badge-count" id="fav-total-count">0 saved</span>
             </div>
 
             <!-- Featured Favorite Audio Card -->
-            <div class="fav-featured-card" id="fav-featured-card">
+            <div class="fav-featured-card" id="fav-featured-card" style="display: none;">
               <div class="fav-featured-glow-bg"></div>
               <div class="fav-featured-art-box">
                 <div class="fav-featured-disc" id="fav-featured-disc">
@@ -1038,9 +1038,9 @@
               </div>
 
               <div class="fav-featured-details">
-                <span class="fav-featured-tag">MOST PLAYED FAVORITE</span>
-                <h3 class="fav-featured-title" id="fav-featured-title">Starlight_Vocal_Mix.mp3</h3>
-                <p class="fav-featured-meta" id="fav-featured-meta">3:45 • 360° Binaural Spatial</p>
+                <span class="fav-featured-tag">FAVORITE MASTER</span>
+                <h3 class="fav-featured-title" id="fav-featured-title">Favorite Audio</h3>
+                <p class="fav-featured-meta" id="fav-featured-meta">360° Binaural Spatial</p>
               </div>
 
               <button class="fav-featured-play-btn" id="btn-fav-featured-play" aria-label="Play featured favorite">
@@ -1053,12 +1053,12 @@
             <!-- Section: Favorite Converted Tracks -->
             <div class="fav-list-section">
               <h4 class="fav-section-label">All Saved Favorites</h4>
-              <div class="empty-state" id="fav-empty-state" style="display: none;">
+              <div class="empty-state" id="fav-empty-state" style="display: flex;">
                 <div class="empty-icon" style="font-size: 2.2rem; margin-bottom: 10px;">⭐</div>
                 <h3>No Favorites Saved Yet</h3>
                 <p style="color: var(--text-muted); font-size: 0.84rem; margin-top: 4px;">Tap the heart or star on any track to add it to your favorites.</p>
               </div>
-              <div class="favorites-tracks-list" id="favorites-tracks-list"></div>
+              <div class="favorites-tracks-list" id="favorites-tracks-list" style="display: none;"></div>
             </div>
 
           </div>
