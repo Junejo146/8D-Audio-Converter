@@ -1,10 +1,10 @@
 :root {
   /* Futuristic Topographic Petrol & Dual Neon Gold/Cyan Theme */
   --bg-dark: #0a141c;
-  --bg-card: #131c26;
-  --bg-card-hover: #182330;
-  --bg-card-border: rgba(255, 255, 255, 0.1);
-  --bg-card-inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --bg-card: #141f2c;
+  --bg-card-hover: #1c2b3d;
+  --bg-card-border: rgba(45, 212, 191, 0.35);
+  --bg-card-inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
 
   /* Primary Neon Gold */
   --accent-gold: #eab308;
@@ -433,15 +433,32 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  margin: 0 20px 16px;
-  padding: 8px 14px;
-  background: rgba(234, 179, 8, 0.1);
-  border: 1px solid rgba(234, 179, 8, 0.3);
+  gap: 10px;
+  margin: 0 18px 18px;
+  padding: 11px 18px;
+  background: rgba(18, 28, 38, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid #eab308;
   border-radius: 30px;
-  color: #fde047;
-  font-size: 0.78rem;
+  color: #ffffff;
+  font-size: 0.84rem;
   font-weight: 500;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.5), 0 0 18px rgba(234, 179, 8, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.headphone-tip-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #facc15;
+  filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.65));
+}
+
+.tip-highlight {
+  color: #fde047;
+  font-weight: 700;
+  text-shadow: 0 0 12px rgba(250, 204, 21, 0.5);
 }
 
 /* Recent Section & Track Cards */
@@ -479,26 +496,31 @@ body {
 }
 
 .track-card {
-  background: var(--bg-card);
-  border: 1px solid var(--bg-card-border);
-  box-shadow: var(--bg-card-inner-glow), 0 4px 16px rgba(0, 0, 0, 0.35);
+  background: rgba(19, 28, 38, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(45, 212, 191, 0.38);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 6px 22px rgba(0, 0, 0, 0.55), 0 0 14px rgba(45, 212, 191, 0.12);
   border-radius: var(--radius-md);
-  padding: 13px 14px;
+  padding: 13px 15px;
   display: flex;
   align-items: center;
   gap: 14px;
   position: relative;
   overflow: hidden;
+  transition: all 0.25s ease;
 }
 
-.track-card:hover {
-  background: var(--bg-card-hover);
+.track-card:hover, .track-card:active {
+  background: rgba(26, 39, 53, 0.98);
+  border-color: rgba(45, 212, 191, 0.65);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 8px 26px rgba(0, 0, 0, 0.6), 0 0 20px rgba(45, 212, 191, 0.25);
 }
 
 .track-card.active-playing {
   border-color: var(--accent-gold);
-  background: #182330;
-  box-shadow: 0 4px 22px rgba(234, 179, 8, 0.3);
+  background: rgba(26, 39, 53, 0.98);
+  box-shadow: 0 6px 26px rgba(0, 0, 0, 0.6), 0 0 22px rgba(234, 179, 8, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .mini-wave-bars {
@@ -632,9 +654,11 @@ body {
 }
 
 .selection-card {
-  background: var(--bg-card);
-  border: 1px solid var(--bg-card-border);
-  box-shadow: var(--bg-card-inner-glow), 0 4px 18px rgba(0, 0, 0, 0.3);
+  background: rgba(19, 28, 38, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(45, 212, 191, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 6px 22px rgba(0, 0, 0, 0.5), 0 0 14px rgba(45, 212, 191, 0.1);
   border-radius: var(--radius-lg);
   padding: 18px;
   display: flex;
@@ -642,10 +666,13 @@ body {
   gap: 16px;
   margin-bottom: 14px;
   cursor: pointer;
+  transition: all 0.25s ease;
 }
 
-.selection-card:active {
-  background: var(--bg-card-hover);
+.selection-card:hover, .selection-card:active {
+  background: rgba(26, 39, 53, 0.98);
+  border-color: rgba(45, 212, 191, 0.65);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 8px 26px rgba(0, 0, 0, 0.6), 0 0 20px rgba(45, 212, 191, 0.22);
 }
 
 .selection-icon-box {
@@ -2679,21 +2706,30 @@ input[type="range"]::-webkit-slider-thumb:active,
 }
 
 .my-audio-card {
-  background: var(--bg-card);
-  border: 1px solid var(--bg-card-border);
-  box-shadow: var(--bg-card-inner-glow), 0 4px 16px rgba(0, 0, 0, 0.3);
+  background: rgba(19, 28, 38, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(45, 212, 191, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 6px 22px rgba(0, 0, 0, 0.5), 0 0 14px rgba(45, 212, 191, 0.1);
   border-radius: var(--radius-md);
-  padding: 12px 14px;
+  padding: 13px 15px;
   display: flex;
   align-items: center;
   gap: 12px;
   position: relative;
+  transition: all 0.25s ease;
+}
+
+.my-audio-card:hover, .my-audio-card:active {
+  background: rgba(26, 39, 53, 0.98);
+  border-color: rgba(45, 212, 191, 0.65);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 8px 26px rgba(0, 0, 0, 0.6), 0 0 20px rgba(45, 212, 191, 0.22);
 }
 
 .my-audio-card.playing {
   border-color: var(--accent-gold);
-  background: #182330;
-  box-shadow: 0 4px 20px rgba(234, 179, 8, 0.2);
+  background: rgba(26, 39, 53, 0.98);
+  box-shadow: 0 6px 26px rgba(0, 0, 0, 0.6), 0 0 22px rgba(234, 179, 8, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .card-art-box {
