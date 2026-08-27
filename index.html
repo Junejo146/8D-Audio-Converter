@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#0c1821" />
+  <meta name="theme-color" content="#FAF4EE" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>8D Audio Converter - Immersive Spatial Sound</title>
@@ -17,7 +17,55 @@
 </head>
 <body>
   <div class="app-layout">
-    
+    <!-- Cinematic Luxury Splash Screen (Matches User Design Screenshot) -->
+    <div id="splash-screen-overlay" class="luxury-splash-overlay" aria-label="Loading 8D Audio Converter">
+      <div class="splash-content-box">
+        <!-- Top Tagline -->
+        <div class="splash-top-tagline">
+          <span class="tagline-line-1">SAME MUSIC</span>
+          <span class="tagline-line-2">BIGGER FEELINGS</span>
+        </div>
+
+        <!-- Center 3D Hero Emblem with Planetary Ring & Floating Notes -->
+        <div class="splash-hero-emblem-wrap">
+          <!-- Floating Music Note 1 (Top Right) -->
+          <div class="splash-floating-note note-top-right">♫</div>
+          
+          <!-- Soft Background Plate / Disc Backdrop -->
+          <div class="splash-disc-backdrop"></div>
+          
+          <!-- Central Crimson Burgundy Orb with Rose-Gold Rim -->
+          <div class="splash-burgundy-orb">
+            <div class="splash-orb-inner-glow"></div>
+            <span class="splash-8d-text">8D</span>
+          </div>
+
+          <!-- Dual 3D Rose-Gold / Bronze Orbital Rings -->
+          <div class="splash-orbital-ring-outer"></div>
+          <div class="splash-orbital-ring-inner"></div>
+
+          <!-- Floating Music Note 2 (Bottom Right) -->
+          <div class="splash-floating-note note-bottom-right">♬</div>
+        </div>
+
+        <!-- App Brand Title & Subtitle -->
+        <div class="splash-brand-info">
+          <h1 class="splash-brand-title">8D Audio Converter</h1>
+          <p class="splash-brand-subtitle">Transform your music into immersive 8D sound.</p>
+        </div>
+
+        <!-- Bottom Loading Dots & Text -->
+        <div class="splash-loading-footer">
+          <div class="splash-dots-row">
+            <span class="splash-dot dot-1"></span>
+            <span class="splash-dot dot-2"></span>
+            <span class="splash-dot dot-3"></span>
+          </div>
+          <span class="splash-loading-label">Loading...</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Authentic Topographic Contour Lines Background Layer -->
     <div class="topographic-background-layer" aria-hidden="true">
       <svg class="topo-svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
@@ -155,7 +203,7 @@
                   <circle cx="30" cy="21" r="3" fill="white" />
                 </svg>
               </div>
-              <span class="hero-label">Select Audio</span>
+              <span class="hero-label" style="color: #FFFFFF !important; font-weight: 800; font-size: 1.15rem; text-shadow: 0 2px 6px rgba(0,0,0,0.35);">Select Audio</span>
             </button>
 
             <!-- Hidden File Input -->
@@ -165,7 +213,7 @@
           <!-- Headphone Recommended Tip -->
           <div class="headphone-tip">
             <div class="headphone-tip-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#881337" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
                 <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
               </svg>
@@ -317,8 +365,23 @@
           <!-- DUAL AUDIO WAVEFORM SLOTS -->
           <div class="dual-audio-container">
             
-            <!-- SLOT 1: NORMAL AUDIO (ORIGINAL) -->
-            <div class="audio-slot-card normal-slot active-slot" id="slot-normal-audio">
+            <!-- EMPTY STATE: NO AUDIO LOADED PROMPT -->
+            <div class="audio-empty-slot-card" id="slot-no-audio-prompt" style="display: flex;">
+              <div class="empty-slot-icon">🎵</div>
+              <div class="empty-slot-text">
+                <h4 class="empty-slot-title">No Audio Loaded Yet</h4>
+                <p class="empty-slot-desc">Please select an audio file to display sound layers and apply 8D effects.</p>
+              </div>
+              <button class="btn-import-prompt" id="btn-studio-import-audio" type="button">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 5v14M5 12h14"></path>
+                </svg>
+                <span>Select Audio</span>
+              </button>
+            </div>
+
+            <!-- SLOT 1: NORMAL AUDIO (ORIGINAL) - Hidden until audio file is imported -->
+            <div class="audio-slot-card normal-slot active-slot" id="slot-normal-audio" style="display: none;">
               <div class="slot-header">
                 <div class="slot-badge normal-badge">
                   <span class="slot-indicator-dot normal-dot"></span>
@@ -332,7 +395,7 @@
                   <canvas id="normal-waveform-canvas" width="260" height="44"></canvas>
                   <div class="slot-time-row">
                     <span id="normal-time-current">0:00</span>
-                    <span id="normal-time-total">4:02</span>
+                    <span id="normal-time-total">0:00</span>
                   </div>
                 </div>
                 <button class="slot-play-btn normal-play-btn" id="btn-play-normal-slot" aria-label="Play Normal Audio">
@@ -343,8 +406,8 @@
               </div>
             </div>
 
-            <!-- PROMPT TO ACTIVATE 8D LAYER -->
-            <div class="slot-create-prompt" id="prompt-create-8d">
+            <!-- PROMPT TO ACTIVATE 8D LAYER (Hidden) -->
+            <div class="slot-create-prompt" id="prompt-create-8d" style="display: none;">
               <div class="prompt-pulse-icon">✨</div>
               <div class="prompt-text">
                 <div class="prompt-title">8D Spatial Layer Inactive</div>
@@ -352,12 +415,12 @@
               </div>
             </div>
 
-            <!-- SLOT 2: 8D CONVERTED AUDIO (Hidden by default until 8D adjustment) -->
+            <!-- SLOT 2: 8D CONVERTED AUDIO (Hidden until 8D edit on loaded audio) -->
             <div class="audio-slot-card spatial-slot" id="slot-8d-audio" style="display: none;">
               <div class="slot-header">
                 <div class="slot-badge spatial-badge">
                   <span class="slot-indicator-dot spatial-dot"></span>
-                  <span>8D SPATIAL AUDIO (EFFECT APPLIED)</span>
+                  <span id="badge-8d-layer-text">8D SPATIAL AUDIO (EFFECT APPLIED)</span>
                 </div>
                 <span class="slot-status-text" id="status-8d-text">360° Orbit Ready</span>
               </div>
@@ -367,7 +430,7 @@
                   <canvas id="spatial-waveform-canvas" width="260" height="44"></canvas>
                   <div class="slot-time-row">
                     <span id="spatial-time-current">0:00</span>
-                    <span id="spatial-time-total">4:02</span>
+                    <span id="spatial-time-total">0:00</span>
                   </div>
                 </div>
                 <button class="slot-play-btn spatial-play-btn" id="btn-play-spatial-slot" aria-label="Play 8D Audio">
@@ -390,7 +453,7 @@
                 <span class="group-hint">Select Effect</span>
               </div>
               <div class="preset-pills-row">
-                <button class="preset-pill active" data-preset="classic">
+                <button class="preset-pill" data-preset="classic">
                   <span>✨ Classic 8D</span>
                 </button>
                 <button class="preset-pill" data-preset="smooth">
@@ -456,7 +519,7 @@
 
           </div>
 
-          <!-- Bottom Action: Convert & Save Button -->
+          <!-- Bottom Action: Convert into 8D & Ready Button -->
           <div class="editor-action-footer">
             <button class="convert-8d-hero-btn" id="btn-editor-export-action">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
@@ -464,7 +527,14 @@
                 <polyline points="7 10 12 15 17 10"></polyline>
                 <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
-              <span>Convert & Save 8D Audio</span>
+              <span>Convert into 8D</span>
+            </button>
+            <button class="convert-8d-hero-btn btn-audio-ready" id="btn-audio-ready-action" style="display: none;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <span>Your audio is ready</span>
             </button>
           </div>
         </section>
@@ -828,10 +898,17 @@
 
             </div>
 
-            <!-- Bottom Cancel / Abort Action -->
+            <!-- Bottom Cancel / Abort / Audio Ready Action -->
             <div class="proc-action-bottom">
               <button class="proc-cancel-btn" id="btn-abort-conversion">
                 Cancel Conversion
+              </button>
+              <button class="convert-8d-hero-btn btn-audio-ready" id="btn-proc-audio-ready" style="display: none; width: 100%;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <span>Your audio is ready</span>
               </button>
             </div>
 
@@ -1078,10 +1155,6 @@
                 <div class="settings-profile-info">
                   <div class="profile-name-row">
                     <h3 class="profile-name">8D Studio User</h3>
-                    <div class="profile-badges-stack">
-                      <span class="badge-pro">PRO ACTIVE</span>
-                      <span class="badge-sub-pill">Pro Studio</span>
-                    </div>
                   </div>
                   <p class="profile-subtitle">Next-Gen Spatial 8D Studio</p>
                 </div>
@@ -1433,7 +1506,6 @@
           </div>
           <div class="drawer-user-info">
             <h4>8D Studio Member</h4>
-            <span class="drawer-badge-pro">PRO ACTIVE</span>
           </div>
         </div>
 
@@ -1675,9 +1747,6 @@
       <span class="toast-icon" id="toast-icon">🗑️</span>
       <span class="toast-message" id="toast-message">Audio deleted successfully</span>
     </div>
-
-    <!-- FULL 3D CINEMATIC ANIMATED SPLASH SCREEN OVERLAY -->
-    <div class="splash-3d-overlay" id="splash-3d-overlay"></div>
 
   </div>
 

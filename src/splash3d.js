@@ -66,8 +66,8 @@ export class SplashScreen3D {
 
     // 1. Scene & Atmosphere Fog
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x061118);
-    this.scene.fog = new THREE.FogExp2(0x061118, 0.045);
+    this.scene.background = new THREE.Color(0xFAF4EE);
+    this.scene.fog = new THREE.FogExp2(0xFAF4EE, 0.03);
 
     // 2. Camera (Responsive mobile portrait optimized perspective)
     this.camera = new THREE.PerspectiveCamera(46, width / height, 0.1, 100);

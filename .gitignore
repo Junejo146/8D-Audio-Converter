@@ -14,8 +14,10 @@ android/local.properties
 *.apk
 *.aab
 
-# Temporary samples
+# Temporary samples & screenshots
 sample_audios/
 downloads/
 yt-dlp.exe
+screen_*.png
+*.png.tmp
 

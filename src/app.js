@@ -1,5 +1,4 @@
 import { Audio8DEngine } from './audioEngine.js';
-import { init3DSplashScreen } from './splash3d.js';
 
 // Initialize 8D Audio Engine
 const engine = new Audio8DEngine();
@@ -19,8 +18,8 @@ function loadTracksFromStorage() {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
-        // Filter out any legacy demo items if they were saved in previous runs
-        return parsed.filter(t => !t.isBuiltInDemo && !t.id.startsWith('demo-'));
+        // Only return real user-imported files
+        return parsed.filter(t => t && t.id && t.id.startsWith('user-import-'));
       }
     }
   } catch (e) {
@@ -28,6 +27,11 @@ function loadTracksFromStorage() {
   }
   return []; // Pure fresh app for real users!
 }
+
+// Clear any old dummy songs/audios
+try {
+  localStorage.removeItem('8d_audio_tracks_library');
+} catch (e) {}
 
 function saveTracksToStorage() {
   try {
@@ -37,8 +41,7 @@ function saveTracksToStorage() {
       durationText: t.durationText,
       dateText: t.dateText,
       is8D: t.is8D,
-      isFavorite: t.isFavorite,
-      isBuiltInDemo: t.isBuiltInDemo || false
+      isFavorite: t.isFavorite
     }));
     localStorage.setItem('8d_audio_tracks_library', JSON.stringify(toSave));
   } catch (e) {
@@ -46,20 +49,48 @@ function saveTracksToStorage() {
   }
 }
 
-// App State
-let tracks = loadTracksFromStorage();
-let currentTrack = tracks[0] || null;
+// App State (Completely Fresh & Clean)
+let tracks = [];
+let currentTrack = null;
 let selectedOptionTrackId = null;
 let pendingDeleteTrackId = null;
 let toastTimer = null;
 
 // Waveform data cache
 let waveformBars = [];
-function generateWaveformData() {
+
+function generateWaveformData(buffer = null) {
   waveformBars = [];
-  const count = 48;
-  for (let i = 0; i < count; i++) {
-    waveformBars.push(Math.sin(i * 0.22) * 0.4 + Math.random() * 0.5 + 0.2);
+  const barCount = 52;
+
+  if (buffer && buffer.getChannelData) {
+    try {
+      const channel = buffer.getChannelData(0);
+      const blockSize = Math.floor(channel.length / barCount);
+      for (let i = 0; i < barCount; i++) {
+        let blockMax = 0;
+        const start = i * blockSize;
+        const end = Math.min(start + blockSize, channel.length);
+        for (let j = start; j < end; j += 12) {
+          const val = Math.abs(channel[j]);
+          if (val > blockMax) blockMax = val;
+        }
+        waveformBars.push(Math.max(0.22, Math.min(1.0, blockMax * 1.8)));
+      }
+      return;
+    } catch (e) {
+      console.warn("Waveform extraction fallback", e);
+    }
+  }
+
+  // Realistic natural audio waveform simulation with rich rhythmic peaks & valleys
+  for (let i = 0; i < barCount; i++) {
+    const t = i / barCount;
+    const arc = Math.sin(t * Math.PI) * 0.45 + 0.35;
+    const beat = Math.sin(i * 0.78) * 0.24 + Math.sin(i * 1.55) * 0.16;
+    const detail = (Math.sin(i * 4.3) * 0.5 + 0.5) * 0.28;
+    const finalVal = Math.max(0.22, Math.min(0.98, arc + beat + detail));
+    waveformBars.push(finalVal);
   }
 }
 
@@ -95,6 +126,9 @@ function openScreen(screenId) {
   }
 
   updateNowPlayingUI();
+  if (window.triggerWaveformRender) {
+    setTimeout(window.triggerWaveformRender, 40);
+  }
 }
 
 /**
@@ -142,25 +176,38 @@ function updateNowPlayingUI() {
 /**
  * Progressive Reveal Controls for 8D Layer
  */
-function unlock8DLayer() {
-  if (is8DLayerUnlocked) return;
-  is8DLayerUnlocked = true;
+function unlock8DLayer(effectName = '8D Spatial') {
+  // STRICT RULE: If no audio track is loaded, DO NOT unlock or show any layer!
+  if (!currentTrack) return;
 
-  const slot8D = document.getElementById('slot-8d-audio');
-  const promptCreate = document.getElementById('prompt-create-8d');
-  const bannerMode = document.getElementById('banner-active-mode');
+  if (!is8DLayerUnlocked) {
+    is8DLayerUnlocked = true;
 
-  if (slot8D) {
-    slot8D.style.display = 'flex';
-    slot8D.classList.add('unlocked');
+    const slot8D = document.getElementById('slot-8d-audio');
+    const promptCreate = document.getElementById('prompt-create-8d');
+    const bannerMode = document.getElementById('banner-active-mode');
+
+    if (slot8D) {
+      slot8D.style.display = 'flex';
+      slot8D.classList.add('unlocked');
+    }
+    if (promptCreate) {
+      promptCreate.style.display = 'none';
+    }
+    if (bannerMode) {
+      bannerMode.textContent = "8D Effect Applied";
+      bannerMode.style.color = "#881337";
+      bannerMode.style.borderColor = "rgba(136, 19, 55, 0.4)";
+    }
   }
-  if (promptCreate) {
-    promptCreate.style.display = 'none';
+
+  const badge8dText = document.getElementById('badge-8d-layer-text');
+  const status8dText = document.getElementById('status-8d-text');
+  if (badge8dText) {
+    badge8dText.textContent = `8D SPATIAL AUDIO (${effectName.toUpperCase()})`;
   }
-  if (bannerMode) {
-    bannerMode.textContent = "8D Layer Ready";
-    bannerMode.style.color = "#00f084";
-    bannerMode.style.borderColor = "rgba(0, 240, 132, 0.4)";
+  if (status8dText) {
+    status8dText.textContent = "360° Orbit Effect Ready";
   }
 }
 
@@ -168,26 +215,52 @@ function resetEditorToNormalOnly() {
   is8DLayerUnlocked = false;
   currentPlayingSlot = null;
 
+  const slotNoAudio = document.getElementById('slot-no-audio-prompt');
+  const slotNormal = document.getElementById('slot-normal-audio');
   const slot8D = document.getElementById('slot-8d-audio');
   const promptCreate = document.getElementById('prompt-create-8d');
-  const slotNormal = document.getElementById('slot-normal-audio');
   const bannerMode = document.getElementById('banner-active-mode');
+  const editorSongTitle = document.getElementById('editor-song-title');
+  const editorDurationText = document.getElementById('editor-duration-text');
 
-  if (slot8D) {
-    slot8D.style.display = 'none';
-    slot8D.classList.remove('unlocked', 'active-slot');
+  if (!currentTrack) {
+    // NO AUDIO LOADED: hide ALL layers, show empty prompt
+    if (slotNoAudio) slotNoAudio.style.display = 'flex';
+    if (slotNormal) slotNormal.style.display = 'none';
+    if (slot8D) slot8D.style.display = 'none';
+    if (promptCreate) promptCreate.style.display = 'none';
+    if (editorSongTitle) editorSongTitle.textContent = 'Select Audio File';
+    if (editorDurationText) editorDurationText.textContent = '0:00 • Ready to Import';
+    if (bannerMode) {
+      bannerMode.textContent = "Stereo Mode";
+      bannerMode.style.color = "#70535B";
+      bannerMode.style.borderColor = "rgba(112, 83, 91, 0.25)";
+    }
+  } else {
+    // AUDIO LOADED: hide empty prompt, show Normal layer ONLY, hide 8D layer until user edits effect
+    if (slotNoAudio) slotNoAudio.style.display = 'none';
+    if (slotNormal) {
+      slotNormal.style.display = 'flex';
+      slotNormal.classList.add('active-slot');
+    }
+    if (slot8D) {
+      slot8D.style.display = 'none';
+      slot8D.classList.remove('unlocked', 'active-slot');
+    }
+    if (promptCreate) {
+      promptCreate.style.display = 'none';
+    }
+    if (editorSongTitle) editorSongTitle.textContent = currentTrack.title;
+    if (editorDurationText) editorDurationText.textContent = currentTrack.durationText || '0:00';
+    if (bannerMode) {
+      bannerMode.textContent = "Original Stereo";
+      bannerMode.style.color = "#70535B";
+      bannerMode.style.borderColor = "rgba(112, 83, 91, 0.25)";
+    }
   }
-  if (promptCreate) {
-    promptCreate.style.display = 'flex';
-  }
-  if (slotNormal) {
-    slotNormal.classList.add('active-slot');
-  }
-  if (bannerMode) {
-    bannerMode.textContent = "Normal Stereo";
-    bannerMode.style.color = "#93c5fd";
-    bannerMode.style.borderColor = "rgba(59, 130, 246, 0.4)";
-  }
+
+  // Clear any active preset selection
+  document.querySelectorAll('.preset-pill').forEach(p => p.classList.remove('active'));
 
   // Ensure NO autoplay!
   engine.set8DEnabled(false);
@@ -316,10 +389,10 @@ function renderTracksList() {
       recentTracksList.innerHTML = tracks.slice(0, 5).map(track => createTrackCardHtml(track)).join('');
     } else {
       recentTracksList.innerHTML = `
-        <div class="empty-recent-box" style="padding: 24px 16px; text-align: center; background: rgba(20, 31, 44, 0.6); border: 1px dashed rgba(45, 212, 191, 0.25); border-radius: 16px; margin-top: 4px;">
-          <div style="font-size: 2rem; margin-bottom: 6px;">🎵</div>
-          <h4 style="color: #ffffff; font-size: 0.92rem; font-weight: 700;">No Recent Audio</h4>
-          <p style="color: var(--text-muted); font-size: 0.76rem; margin-top: 4px; line-height: 1.4;">Tap "+ Select Audio" above to import your first song for 8D conversion.</p>
+        <div class="empty-recent-box" style="padding: 24px 16px; text-align: center; background: #FFFFFF; border: 1.5px dashed rgba(136, 19, 55, 0.22); border-radius: 16px; margin-top: 4px; box-shadow: 0 4px 14px rgba(42, 8, 19, 0.05);">
+          <div style="font-size: 2.2rem; margin-bottom: 6px;">🎵</div>
+          <h4 style="color: #2A0813; font-size: 0.95rem; font-weight: 800;">No Recent Audio</h4>
+          <p style="color: #70535B; font-size: 0.78rem; margin-top: 4px; line-height: 1.4; font-weight: 500;">Tap "+ Select Audio" above to import your first song for 8D conversion.</p>
         </div>`;
     }
   }
@@ -350,10 +423,10 @@ function renderTracksList() {
       libraryTracksList.innerHTML = filtered.map(track => createLibraryCardHtml(track)).join('');
     } else {
       libraryTracksList.innerHTML = `
-        <div class="empty-state" style="padding: 40px 14px; text-align: center;">
+        <div class="empty-state" style="padding: 40px 14px; text-align: center; background: #FFFFFF; border: 1.5px dashed rgba(136, 19, 55, 0.22); border-radius: 16px; box-shadow: 0 4px 14px rgba(42, 8, 19, 0.05);">
           <div style="font-size: 2.4rem; margin-bottom: 8px;">📂</div>
-          <h4 style="color: #ffffff; font-size: 0.98rem; font-weight: 700;">Your Library is Empty</h4>
-          <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 4px;">Import audio files to build your converted 8D spatial music library.</p>
+          <h4 style="color: #2A0813; font-size: 1rem; font-weight: 800;">Your Library is Empty</h4>
+          <p style="color: #70535B; font-size: 0.82rem; margin-top: 4px; font-weight: 500;">Import audio files to build your converted 8D spatial music library.</p>
         </div>`;
     }
   }
@@ -708,11 +781,18 @@ function selectTrack(trackId) {
   currentTrack = track;
   if (track.isBuiltInDemo && !track.customBuffer) {
     engine.createDemoTrackBuffer();
+    generateWaveformData(engine.audioBuffer);
   } else if (track.customBuffer) {
     engine.audioBuffer = track.customBuffer;
     engine.duration = track.customBuffer.duration;
+    generateWaveformData(track.customBuffer);
+  } else {
+    generateWaveformData(null);
   }
   updateNowPlayingUI();
+  if (window.triggerWaveformRender) {
+    window.triggerWaveformRender();
+  }
 }
 
 async function handleTrackPlayClick(trackId) {
@@ -746,8 +826,15 @@ function applyPreset(presetKey) {
   const p = PRESETS_CONFIG[presetKey];
   if (!p) return;
 
+  const names = {
+    classic: 'Classic 8D',
+    smooth: 'Smooth 8D',
+    deep: 'Deep 8D',
+    fast: 'Fast 8D'
+  };
+
   // Unlock the 8D Layer when user chooses any preset
-  unlock8DLayer();
+  unlock8DLayer(names[presetKey] || '8D Spatial');
 
   engine.setOrbitSpeed(p.speed);
   engine.setDepth(p.depth);
@@ -781,45 +868,89 @@ function setupWaveformCanvases() {
   function renderWave(canvas, progress, theme, isActive) {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
-    ctx.clearRect(0, 0, width, height);
+    if (!ctx) return;
 
-    const numBars = waveformBars.length;
-    const barWidth = 3;
-    const gap = (width - numBars * barWidth) / (numBars - 1);
+    const dpr = window.devicePixelRatio || 1;
+    const displayWidth = canvas.clientWidth || (canvas.parentElement ? canvas.parentElement.clientWidth : 240) || 240;
+    const displayHeight = canvas.clientHeight || 38;
 
-    const isLight = document.body.classList.contains('theme-light');
+    const targetWidth = Math.round(displayWidth * dpr);
+    const targetHeight = Math.round(displayHeight * dpr);
+
+    if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+    }
+
+    ctx.save();
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, displayWidth, displayHeight);
+
+    const numBars = waveformBars.length || 52;
+    const barWidth = 3.2;
+    const totalBarsWidth = numBars * barWidth;
+    const gap = Math.max(1.2, (displayWidth - totalBarsWidth) / (numBars - 1));
+
+    // Draw central audio guide line
+    ctx.fillStyle = theme === 'spatial' ? 'rgba(136, 19, 55, 0.12)' : 'rgba(112, 83, 91, 0.12)';
+    ctx.fillRect(0, Math.round(displayHeight / 2) - 0.5, displayWidth, 1);
 
     for (let i = 0; i < numBars; i++) {
-      const x = Math.round(i * (barWidth + gap));
-      const val = waveformBars[i];
-      const barHeight = Math.round(val * (height - 8));
-      const y = Math.round((height - barHeight) / 2);
-      const isPlayed = isActive && ((x / width) <= progress);
+      const x = i * (barWidth + gap);
+      const val = waveformBars[i] || 0.4;
+      const barHeight = Math.max(6, Math.round(val * (displayHeight - 6)));
+      const y = Math.round((displayHeight - barHeight) / 2);
+      const isPlayed = (x / displayWidth) <= progress;
 
-      if (isPlayed) {
-        if (theme === 'normal') {
-          ctx.fillStyle = isLight ? '#0284c7' : '#cbd5e1';
+      if (isPlayed && progress > 0) {
+        if (theme === 'spatial') {
+          // 8D active played color
+          ctx.fillStyle = '#881337';
         } else {
-          ctx.fillStyle = isLight ? '#d97706' : '#facc15';
+          // Normal active played color
+          ctx.fillStyle = '#4C0519';
         }
       } else {
-        if (isLight) {
-          ctx.fillStyle = isActive ? '#475569' : '#64748b';
+        // High-contrast, crystal-clear unplayed waveform bars
+        if (theme === 'spatial') {
+          ctx.fillStyle = isActive ? 'rgba(136, 19, 55, 0.65)' : 'rgba(136, 19, 55, 0.42)';
         } else {
-          ctx.fillStyle = isActive ? 'rgba(255, 255, 255, 0.45)' : 'rgba(255, 255, 255, 0.25)';
+          ctx.fillStyle = isActive ? 'rgba(112, 83, 91, 0.65)' : 'rgba(112, 83, 91, 0.42)';
         }
       }
-      ctx.fillRect(x, y, barWidth, barHeight);
+
+      // Draw rounded capsule waveform pill
+      const radius = Math.min(1.6, barHeight / 2);
+      if (ctx.roundRect) {
+        ctx.beginPath();
+        ctx.roundRect(x, y, barWidth, barHeight, radius);
+        ctx.fill();
+      } else {
+        ctx.fillRect(x, y, barWidth, barHeight);
+      }
     }
 
-    // Scrubber line only on active playing canvas
-    if (isActive) {
-      const scrubX = Math.round(progress * width);
-      ctx.fillStyle = isLight ? (theme === 'normal' ? '#0284c7' : '#d97706') : (theme === 'normal' ? '#cbd5e1' : '#facc15');
-      ctx.fillRect(scrubX - 1, 2, 2, height - 4);
+    // Needle Playhead Indicator (when playing or scrubbed)
+    if (progress > 0 && progress < 1) {
+      const scrubX = Math.min(displayWidth - 2, Math.max(1, progress * displayWidth));
+      const needleColor = theme === 'spatial' ? '#881337' : '#70535B';
+      
+      // Needle line
+      ctx.fillStyle = needleColor;
+      ctx.fillRect(scrubX - 1, 0, 2, displayHeight);
+
+      // Top & bottom glowing beacon dots
+      ctx.beginPath();
+      ctx.arc(scrubX, 3, 2.5, 0, Math.PI * 2);
+      ctx.arc(scrubX, displayHeight - 3, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fill();
+      ctx.strokeStyle = needleColor;
+      ctx.lineWidth = 1;
+      ctx.stroke();
     }
+
+    ctx.restore();
   }
 
   let waveformAnimId = null;
@@ -847,29 +978,32 @@ function setupWaveformCanvases() {
     }
   }
 
-  // Expose function to trigger waveform update
-  window.triggerWaveformRender = function() {
-    if (!waveformAnimId) {
-      drawAll();
-    }
-  };
+  // Expose function globally to trigger waveform update
+  window.triggerWaveformRender = drawAll;
+  window.updateWaveforms = drawAll;
 
-  // Initial single static render
-  drawAll();
-
-  // Waveform Click to Seek
+  // Click / Drag to seek on waveforms
   [normalCanvas, spatialCanvas, previewCanvas, resultCanvas].forEach(canvas => {
     if (!canvas) return;
     canvas.onclick = (e) => {
       const rect = canvas.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
-      const percent = Math.max(0, Math.min(1, clickX / rect.width));
-      if (engine.duration) {
-        engine.seek(percent * engine.duration);
+      const ratio = Math.max(0, Math.min(1, clickX / rect.width));
+      if (engine.duration > 0) {
+        engine.seek(ratio * engine.duration);
         drawAll();
       }
     };
   });
+
+  window.addEventListener('resize', () => {
+    drawAll();
+  });
+
+  // Initial draw
+  drawAll();
+  setTimeout(drawAll, 100);
+  setTimeout(drawAll, 300);
 }
 
 /**
@@ -908,7 +1042,7 @@ function setupProcessingBgCanvas() {
           const y = (h / 2) + Math.sin(x * 0.02 + phase + wave * 1.5) * (20 + wave * 12);
           ctx.lineTo(x, y);
         }
-        ctx.strokeStyle = wave === 0 ? 'rgba(45, 212, 191, 0.35)' : wave === 1 ? 'rgba(234, 179, 8, 0.3)' : 'rgba(56, 189, 248, 0.22)';
+        ctx.strokeStyle = wave === 0 ? 'rgba(136, 19, 55, 0.4)' : wave === 1 ? 'rgba(190, 18, 60, 0.35)' : 'rgba(244, 63, 94, 0.25)';
         ctx.lineWidth = 2;
         ctx.stroke();
       }
@@ -927,14 +1061,22 @@ async function startConversionFlow() {
   openScreen('screen-conversion-processing');
   if (window.startProcBgAnimation) window.startProcBgAnimation();
 
+  // Reset processing screen buttons
+  const btnProcAudioReady = document.getElementById('btn-proc-audio-ready');
+  const btnAbortConv = document.getElementById('btn-abort-conversion');
+  if (btnProcAudioReady) btnProcAudioReady.style.display = 'none';
+  if (btnAbortConv) btnAbortConv.style.display = 'block';
+
   // Guarantee audio buffer exists
-  if (!engine.audioBuffer) {
-    if (currentTrack && currentTrack.customBuffer) {
-      engine.audioBuffer = currentTrack.customBuffer;
-      engine.duration = currentTrack.customBuffer.duration;
-    } else {
-      engine.createDemoTrackBuffer();
-    }
+  if (!currentTrack || (!engine.audioBuffer && !currentTrack.customBuffer)) {
+    showToast('⚠️ Please select an audio file first', 'normal');
+    openScreen('screen-audio-select');
+    return;
+  }
+
+  if (!engine.audioBuffer && currentTrack.customBuffer) {
+    engine.audioBuffer = currentTrack.customBuffer;
+    engine.duration = currentTrack.customBuffer.duration;
   }
 
   const procSongTitle = document.getElementById('proc-song-title');
@@ -943,7 +1085,7 @@ async function startConversionFlow() {
 
   if (currentTrack) {
     if (procSongTitle) procSongTitle.textContent = currentTrack.title;
-    if (procDurationText) procDurationText.textContent = currentTrack.durationText || '4:02';
+    if (procDurationText) procDurationText.textContent = currentTrack.durationText || '0:00';
   }
 
   // Start from 0%
@@ -977,7 +1119,7 @@ async function startConversionFlow() {
         updateProcStep(1, 'completed');
         updateProcStep(2, 'completed');
         updateProcStep(3, 'completed');
-        if (procMainStatus) procMainStatus.textContent = "Conversion Complete! 🎉";
+        if (procMainStatus) procMainStatus.textContent = "Your audio is ready! ✨";
       }
     });
 
@@ -988,13 +1130,20 @@ async function startConversionFlow() {
     updateProcStep(1, 'completed');
     updateProcStep(2, 'completed');
     updateProcStep(3, 'completed');
-    if (procMainStatus) procMainStatus.textContent = "Conversion Complete! 🎉";
+    if (procMainStatus) procMainStatus.textContent = "Your audio is ready! ✨";
 
-    setTimeout(() => {
-      if (!isProcessingAborted) {
-        openScreen('screen-audio-result');
-      }
-    }, 800);
+    // Reveal "Your audio is ready" action button
+    if (btnProcAudioReady) {
+      btnProcAudioReady.style.display = 'flex';
+      if (btnAbortConv) btnAbortConv.style.display = 'none';
+    }
+
+    const btnEditorExport = document.getElementById('btn-editor-export-action');
+    const btnEditorReady = document.getElementById('btn-audio-ready-action');
+    if (btnEditorExport && btnEditorReady) {
+      btnEditorExport.style.display = 'none';
+      btnEditorReady.style.display = 'flex';
+    }
 
   } catch (err) {
     console.error("Conversion error:", err);
@@ -1004,6 +1153,7 @@ async function startConversionFlow() {
     }
   }
 }
+
 
 function setGaugePercent(pct) {
   const rounded = Math.round(pct);
@@ -1084,7 +1234,7 @@ function setupEventListeners() {
       try {
         const buffer = await engine.loadAudioFile(file);
         const newTrack = {
-          id: 'user-' + Date.now(),
+          id: 'user-import-' + Date.now(),
           title: file.name,
           durationText: formatTime(buffer.duration),
           dateText: 'Just now',
@@ -1094,7 +1244,7 @@ function setupEventListeners() {
         };
         tracks.unshift(newTrack);
         saveTracksToStorage();
-        currentTrack = newTrack;
+        selectTrack(newTrack.id);
         renderTracksList();
         showToast(`🎵 Loaded "${file.name}"`, "normal");
 
@@ -1146,24 +1296,38 @@ function setupEventListeners() {
     };
   }
 
-  // Presets
+  // Studio Screen: Empty Slot "Select Audio" Button
+  const btnStudioImportAudio = document.getElementById('btn-studio-import-audio');
+  if (btnStudioImportAudio) {
+    btnStudioImportAudio.onclick = () => openScreen('screen-audio-select');
+  }
+
+  // Presets (Only allowed when audio is loaded)
   document.querySelectorAll('.preset-pill').forEach(pill => {
     pill.onclick = () => {
+      if (!currentTrack) {
+        showToast('⚠️ Please select an audio file first', 'normal');
+        openScreen('screen-audio-select');
+        return;
+      }
       document.querySelectorAll('.preset-pill').forEach(p => p.classList.remove('active'));
       pill.classList.add('active');
       applyPreset(pill.getAttribute('data-preset'));
     };
   });
 
-  // Simplified Sliders (adjusting unlocks 8D layer without autoplay)
+  // Simplified Sliders (adjusting unlocks 8D layer ONLY when audio is loaded)
   const sliderSpeed = document.getElementById('slider-speed');
   const valSpeed = document.getElementById('val-speed');
   if (sliderSpeed && valSpeed) {
     sliderSpeed.oninput = (e) => {
-      unlock8DLayer();
       const v = parseFloat(e.target.value);
-      engine.setOrbitSpeed(v);
       valSpeed.textContent = `${v.toFixed(1)}s`;
+      if (!currentTrack) {
+        return;
+      }
+      unlock8DLayer(`Speed ${v.toFixed(1)}s`);
+      engine.setOrbitSpeed(v);
     };
   }
 
@@ -1171,17 +1335,26 @@ function setupEventListeners() {
   const valDepth = document.getElementById('val-depth');
   if (sliderDepth && valDepth) {
     sliderDepth.oninput = (e) => {
-      unlock8DLayer();
       const v = parseFloat(e.target.value);
-      engine.setDepth(v);
       valDepth.textContent = `${v.toFixed(1)}m`;
+      if (!currentTrack) {
+        return;
+      }
+      unlock8DLayer(`Depth ${v.toFixed(1)}m`);
+      engine.setDepth(v);
     };
   }
 
   const switchEditorReverb = document.getElementById('switch-editor-reverb');
   if (switchEditorReverb) {
     switchEditorReverb.onchange = (e) => {
-      unlock8DLayer();
+      if (!currentTrack) {
+        e.target.checked = false;
+        showToast('⚠️ Please select an audio file first', 'normal');
+        openScreen('screen-audio-select');
+        return;
+      }
+      unlock8DLayer('Reverb Space');
       engine.updateReverbMix(e.target.checked ? 0.5 : 0);
     };
   }
@@ -1189,14 +1362,35 @@ function setupEventListeners() {
   const switchEditorBass = document.getElementById('switch-editor-bass');
   if (switchEditorBass) {
     switchEditorBass.onchange = (e) => {
-      unlock8DLayer();
+      if (!currentTrack) {
+        e.target.checked = false;
+        showToast('⚠️ Please select an audio file first', 'normal');
+        openScreen('screen-audio-select');
+        return;
+      }
+      unlock8DLayer('Bass Boost');
       engine.setBassBoost(e.target.checked);
     };
   }
 
-  // Convert Action Button
+  // Convert Action Button (Convert into 8D)
   const btnEditorExportAction = document.getElementById('btn-editor-export-action');
   if (btnEditorExportAction) btnEditorExportAction.onclick = startConversionFlow;
+
+  // Your Audio is Ready Buttons (Opens Result / Save Screen)
+  const btnAudioReadyAction = document.getElementById('btn-audio-ready-action');
+  if (btnAudioReadyAction) {
+    btnAudioReadyAction.onclick = () => {
+      openScreen('screen-audio-result');
+    };
+  }
+
+  const btnProcAudioReady = document.getElementById('btn-proc-audio-ready');
+  if (btnProcAudioReady) {
+    btnProcAudioReady.onclick = () => {
+      openScreen('screen-audio-result');
+    };
+  }
 
   // Back Buttons
   const btnBackFromSelect = document.getElementById('btn-back-from-select');
@@ -1617,18 +1811,20 @@ function setupEventListeners() {
   const themeModeDesc = document.getElementById('theme-mode-desc');
 
   function setTheme(theme) {
-    if (theme === 'light') {
+    if (theme === 'dark') {
+      document.body.classList.remove('theme-light');
+      document.body.classList.add('theme-dark');
+      if (btnThemeDark) btnThemeDark.classList.add('active');
+      if (btnThemeLight) btnThemeLight.classList.remove('active');
+      if (themeModeDesc) themeModeDesc.textContent = 'Dark Velvet Wine';
+      localStorage.setItem('8d_app_theme', 'dark');
+    } else {
+      document.body.classList.remove('theme-dark');
       document.body.classList.add('theme-light');
       if (btnThemeDark) btnThemeDark.classList.remove('active');
       if (btnThemeLight) btnThemeLight.classList.add('active');
-      if (themeModeDesc) themeModeDesc.textContent = 'Light Frosted Studio';
+      if (themeModeDesc) themeModeDesc.textContent = 'Light Peach Cream';
       localStorage.setItem('8d_app_theme', 'light');
-    } else {
-      document.body.classList.remove('theme-light');
-      if (btnThemeDark) btnThemeDark.classList.add('active');
-      if (btnThemeLight) btnThemeLight.classList.remove('active');
-      if (themeModeDesc) themeModeDesc.textContent = 'Dark Cyber Neon';
-      localStorage.setItem('8d_app_theme', 'dark');
     }
     if (window.triggerWaveformRender) {
       window.triggerWaveformRender();
@@ -1638,8 +1834,8 @@ function setupEventListeners() {
   if (btnThemeDark) btnThemeDark.onclick = () => setTheme('dark');
   if (btnThemeLight) btnThemeLight.onclick = () => setTheme('light');
 
-  const savedTheme = localStorage.getItem('8d_app_theme') || 'dark';
-  setTheme(savedTheme);
+  // STRICT REQUIREMENT: Always default to Light Theme on app startup
+  setTheme('light');
 
   // Track 3-Dots Action Sheet Handlers
   const btnCloseTrackOptions = document.getElementById('btn-close-track-options');
@@ -1779,11 +1975,31 @@ function init() {
     selectTrack(tracks[0].id);
   }
 
-  // Launch Full 3D Cinematic Animated Splash Screen
-  try {
-    init3DSplashScreen();
-  } catch (err) {
-    console.warn('3D Splash initialization warning:', err);
+  // Launch Luxury Animated Splash Screen (Matches User Design Screenshot)
+  const splashOverlay = document.getElementById('splash-screen-overlay');
+  if (splashOverlay) {
+    let hasHidden = false;
+    const hideSplash = () => {
+      if (hasHidden) return;
+      hasHidden = true;
+      splashOverlay.classList.add('splash-fade-out');
+      setTimeout(() => {
+        if (splashOverlay && splashOverlay.parentNode) {
+          splashOverlay.remove();
+        }
+      }, 650);
+    };
+
+    // Show for 2.2s then smoothly reveal app, or tap anytime to skip
+    const splashTimer = setTimeout(hideSplash, 2200);
+    splashOverlay.addEventListener('click', () => {
+      clearTimeout(splashTimer);
+      hideSplash();
+    });
+    splashOverlay.addEventListener('touchstart', () => {
+      clearTimeout(splashTimer);
+      hideSplash();
+    }, { passive: true });
   }
 }
 
